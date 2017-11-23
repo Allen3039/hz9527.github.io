@@ -1,5 +1,130 @@
 /*reset*/
+html, body, div, span, a {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font-weight: normal;
+  vertical-align: baseline;
+}
+
+a {
+  color: #333;
+  -webkit-backface-visibility: hidden;
+  text-decoration: none;
+}
+
+body {
+  -webkit-text-size-adjust: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  font-family: 'PingFang SC', 'STHeitiSC-Light', 'Helvetica-Light', arial, sans-serif, 'Droid Sans Fallback';
+  user-select: none;
+}
+/*common css*/
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #30415D;
+  text-align: right;
+  color: #fff;
+}
+/*pc style*/
+@media (min-width: 1081px) {
+  .container {
+    width: 1020px;
+    margin: 0 auto;
+  }
+  body {
+    padding-bottom: 80px;
+  }
+  .footer {
+    height: 80px;
+    line-height: 80px;
+  }
+  /*list style*/
+  .item-tit {
+    font-size: 20px;
+  }
+  .item-text {
+    font-size: 16px;
+  }
+  .item-footer {
+    display: none;
+  }
+}
+/*phone style*/
+@media (max-width: 1080px) {
+  body {
+    padding-bottom: 40px;
+    background: #eee;
+  }
+  .footer {
+    height: 40px;
+    line-height: 40px;
+    font-size: 13px;
+    box-sizing: border-box;
+    padding-right: 15px;
+  }
+  /*list style*/
+  .item {
+    background: #fff;
+    padding: 10px 15px;
+  }
+  .item-tit {
+    font-size: 16px;
+  }
+  .item-text {
+    font-size: 13px;
+  }
+  .item-tit .item-tip {
+    display: none;
+  }
+  .item-footer {
+    position: relative;
+  }
+  .item-footer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 1px;
+    transform-origin: top 0;
+    background: #f55;
+  }
+
+}
+@media (-webkit-min-device-pixel-ratio: 2), /* Webkit-based browsers */
+     (min--moz-device-pixel-ratio: 2),    /* Older Firefox browsers (prior to Firefox 16) */
+     (min-resolution: 2dppx) {
+  .item-footer::after {
+    width: 200%;
+    transform: scale(0.5) translate(-50%, 0);
+  }
+}
+@media (-webkit-min-device-pixel-ratio: 3),
+     (min--moz-device-pixel-ratio: 3),
+     (min-resolution: 3dppx) {
+  .item-footer::after {
+    width: 300%;
+    transform: scale(0.5) translate(-50%, 0);
+  }
+}
 /*toast style*/
 /*list style*/
+.item-text {
+  color: #666;
+}
+.item-tip {
+  display: inline-block;
+  background: #4CDEF5;
+  color: #fff;
+  line-height: 20px;
+  font-size: 14px;
+  padding: 0 5px;
+  border-radius: 3px;
+  margin: 0 5px;
+}
 /*item style*/
 /*swiper style*/

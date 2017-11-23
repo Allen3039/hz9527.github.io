@@ -1,27 +1,5 @@
 window.list = { // init render & will append list-con into body
-  // init: function (config) { // init in index.js
-  //   this.render(config);
-  //   // if (typeof cb === 'function') {
-  //   //   var swiperList = [];
-  //   //   for (var i = 0; i < config.length; i++) {
-  //   //     if (config[i].swiper > -1) {
-  //   //       swiperList.push({
-  //   //         title: config[i].title,
-  //   //         description: config[i].description,
-  //   //         tips: config[i].tips,
-  //   //         path: config[i].path,
-  //   //         target: config[i].target,
-  //   //         swiper: config[i].swiper
-  //   //       });
-  //   //     }
-  //   //   }
-  //   //   swiperList.sort(function (pre, next) {
-  //   //     return pre.swiper - next.swiper
-  //   //   })
-  //   //   cb(swiperList);
-  //   // }
-  // },
-  render: function (list) {
+  init: function (list) {
     var str = '';
     for (var i = 0; i < list.length; i++) {
       str += this._getItem(list[i]);
@@ -31,13 +9,21 @@ window.list = { // init render & will append list-con into body
       content = document.createElement('div');
       content.className = 'list-con';
       content.innerHTML = str;
-      document.querySelector('body').appendChild(content);
+      document.querySelector('body').insertBefore(content, document.querySelector('.footer'));
     } else {
       content.innerHTML = str;
     }
   },
   _getItem: function (item) {
-    var result = '<div class="item" ></div>'
+    var tips = this._getTips(item.tips)
+    var result = '<div class="item container" data-path="' + item.path + '">' +
+      '<div class="item-tit"data-path="' + item.path + '">' +item.title + tips + '</div>' +
+      '<div class="item-text"data-path="' + item.path + '">' + item.description +
+      '</div><div class="item-footer"data-path="' + item.path + '">' + tips + '</div></div>';
     return result
+  },
+  _getTips: function (tips) {
+    var str = tips.join('</span><span class="item-tip">')
+    return '<span class="item-tip">' + str + '</span>'
   }
 }

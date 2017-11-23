@@ -1,5 +1,5 @@
 window.swiper = {
-  init (config, target) { // target pc phone
+  init: function (config, target) { // target pc phone
     var swiperList = [];
     for (var i = 0; i < config.length; i++) {
       if (config[i].swiper > -1) {
@@ -20,7 +20,7 @@ window.swiper = {
       this.render(swiperList, target)
     }
   },
-  render (list, target) {
+  render: function (list, target) {
 
   }
 }

@@ -1,5 +1,6 @@
 var gulp = require('gulp')
 var uglify = require('gulp-uglify')
+var minifyCss = require('gulp-clean-css')
 var concat = require('gulp-concat')
 var path = require('path')
 var resolve = (p = '') => path.resolve(__dirname, '../static', p)
@@ -15,17 +16,16 @@ var paths = {
 }
 
 gulp.task('script', () => {
-  console.log('build script')
   return gulp.src(paths.scripts)
-    .pipe(concat('index.min.js'))
     .pipe(uglify())
+    .pipe(concat('index.min.js'))
     .pipe(gulp.dest(resolve()))
 });
 
 gulp.task('css', () => {
   return gulp.src(paths.css)
+    .pipe(minifyCss())
     .pipe(concat('index.min.css'))
-    .pipe(uglify())
     .pipe(gulp.dest((resolve())))
 });
 
