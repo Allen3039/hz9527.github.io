@@ -8,11 +8,14 @@ window.swiper = {
   transX: 0,
   stepWidth: 0,
   hasMove: 0, // -1 last to first 1 first to last
+  index: 0,
+  length: 0,
   init: function (config, target) { // target pc phone
     var list = this._initList(config);
     if (list) {
       this.render(list, target);
       if (list.length > 1) {
+        this.length = list.length
         this._initAnimation(target, list.length * this.width);
       }
     }
@@ -36,74 +39,92 @@ window.swiper = {
     }
     content.style.width =  list.length * this.width + 'px';
   },
-  _initAnimation: function (target, tWidth) {
+  _initAnimation: function (target) {
     var dom = document.querySelector('.swiper-con');
-    this._initEvent(dom, target, tWidth);
+    this._initEvent(dom, target);
     this.stepWidth = this.moveTime / this.stepTime;
-    this.wait(dom, tWidth);
+    this.wait(dom);
   },
-  move: function (dom, tWidth) {
+  move: function (dom) {
     var that = this;
     this.timer = setTimeout(function () {
-      var value = (that.transX + that.stepWidth) % that.width
-      if (value >= that.stepWidth && value <= that.width - that.stepWidth) {
-        that._move(dom, that.stepWidth, tWidth);
-        that.move(dom, tWidth);
+      var value = that.transX + that.stepWidth;
+      value = Math.abs(value) % that.width;
+      if (value >= that.stepWidth && value < that.width) {
+        that._move(dom, that.stepWidth);
+        that.move(dom);
       } else {
-        that._move(dom, that.width - that.transX % that.width, tWidth);
         clearTimeout(that.timer)
         that.timer = null;
-        that.wait(dom, tWidth);
+        that._move(dom, true);
+        // that.wait(dom);
       }
     }, this.stepTime)
   },
-  wait: function (dom, tWidth) {
+  wait: function (dom) {
     var that = this;
     this.timer = setTimeout(function () {
       clearTimeout(that.timer)
       that.timer = null;
-      that.move(dom, tWidth);
+      that.move(dom);
     }, this.waitTime)
   },
-  _initEvent: function (dom, target, tWidth) {
+  _initEvent: function (dom, target) {
     var that = this;
-    var preX, sx;
     if (target === 'pc') {
+      var canMove = false;
+      var sx, trans;
+      dom.onmousedown = function (e) {
+        if (that.timer) {
+          clearTimeout(that.timer);
+          that.timer = null;
+          sx = e.clientX;
+          canMove = true;
+        }
+      }
+      document.onmouseup = function () {
+        if (!that.timer) {
+          canMove = false;
+          that.move(dom);
+        }
+      }
       dom.onmousemove = function (e) {
-        if (e.buttons === 1) {
-          if (that.timer) {
-            clearTimeout(that.timer);
-            that.timer = null;
-            preX = e.offsetX;
-            sx = that.transX;
-          } else {
-            that._move(dom, null, tWidth, sx + preX - e.offsetX);
-          }
-        } else if (!that.timer) {
-          preX = null;
-          that.move(dom, tWidth);
+        if (canMove && e.buttons === 1) {
+          that._move(dom, sx - e.clientX);
+          sx = e.clientX;
         }
       }
     }
   },
-  _move: function (dom, m, tWidth, x) {
-    if (typeof x === 'number') {
-      this.transX = x;
-    } else {
+  _move: function (dom, m) { // m move or fix Number Boolean
+    var tWidth = this.length * this.width;
+    if (typeof m === 'number') {
       this.transX += m;
+    } else { // 从右往左
+      console.log(this.transX)
+      // this.transX += this.width - Math.abs(this.transX % this.width);
+      // if (this.transX < 0) {
+      //   this.transX = 0;
+      //   this.index = 0;
+      // } else if (this.transX > tWidth - this.width) {
+      //
+      //   this.index = 0;
+      // } else {
+      //   this.index = this.transX / this.width;
+      // }
     }
     // 如果<0将最后一项移到最前方；<-width移动整体； >tWidth-width将第一项移到最后；>tWidth移动整体
     if (this.transX < 0 && this.hasMove !== -1) {
       this.hasMove = -1
       this._moveItem(dom.lastChild, -tWidth);
-    } else if (this.transX < -this.width) {
+    } else if (this.transX <= -this.width && this.hasMove !== 0) {
       this.hasMove = 0;
       this._moveItem(dom.lastChild, 0);
       this.transX = tWidth - this.width;
     } else if (this.transX > tWidth - this.width && this.hasMove !== 1) {
       this.hasMove = 1;
       this._moveItem(dom.firstChild, tWidth);
-    } else if (this.transX > tWidth) {
+    } else if (this.transX >= tWidth && this.hasMove !== 0) {
       this.hasMove = 0;
       this._moveItem(dom.firstChild, 0);
       this.transX = 0;
