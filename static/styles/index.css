@@ -45,6 +45,17 @@ body {
     line-height: 80px;
   }
   /*list style*/
+  .list-con {
+    margin-top: 20px;
+  }
+  .item {
+    padding: 15px;
+    border: 1px solid #EDEDED;
+    border-bottom: 0;
+  }
+  .item:last-child {
+    border-bottom: 1px solid #EDEDED;
+  }
   .item-tit {
     font-size: 20px;
   }
@@ -53,6 +64,19 @@ body {
   }
   .item-footer {
     display: none;
+  }
+  /*swiper style*/
+  .swiper-con .container {
+    height: 500px;
+  }
+  .swiper-tit {
+    padding-top: 150px;
+    text-align: center;
+    font-size: 32px;
+  }
+  .swiper-text {
+    padding-top: 30px;
+    font-size: 20px;
   }
 }
 /*phone style*/
@@ -72,6 +96,7 @@ body {
   .item {
     background: #fff;
     padding: 10px 15px;
+    margin: 10px 0;
   }
   .item-tit {
     font-size: 16px;
@@ -103,6 +128,16 @@ body {
   /*swiper style*/
   .swiper-con .container {
     height: 180px;
+    padding: 0 15px;
+  }
+  .swiper-tit {
+    padding-top: 40px;
+    text-align: center;
+    font-size: 20px;
+  }
+  .swiper-text {
+    padding-top: 20px;
+    font-size: 16px;
   }
 
 }

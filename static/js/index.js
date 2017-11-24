@@ -1,26 +1,22 @@
 function InitEvent (el, cb, arg, context) {
-  !this.cb && cb && (InitEvent.prototype.cb = cb);
-  this.arg = arg;
-  this.context = context || null;
   var that = this;
   el.onclick = function (e) {
-    var next = that.next(e.target);
-    if (typeof that.cb === 'function') {
-      that.cb.apply(that.context, (arg || []).push(next));
-    } else {
-      next();
+    var path = e.target.dataset.path || e.target.parentNode.dataset.path;
+    if (path) {
+      function next () {
+        window.location = 'https://hz9527.github.io' + path;
+      }
+      if (typeof cb === 'function') {
+        arg = arg || [];
+        arg.push(path);
+        arg.push(next);
+        cb.apply(context, arg);
+      } else {
+        next();
+      }
     }
   }
 };
-InitEvent.prototype.next = function (target) {
-  return function next () {
-    var path;
-    if (path = target.dataset.path || target.parentNode.dataset.path) {
-      window.location = 'https://hz9527.github.io' + path;
-    }
-    target = null;
-  }
-}
 
 // return /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ppo.ua('l'));
 // return lower ? window.navigator.userAgent.toLowerCase() : window.navigator.userAgent;
@@ -34,6 +30,12 @@ window.ctrlObj = {
       window.list.init(window.config)
       window.swiper.init(window.config, that.target)
       new InitEvent(document.querySelector('.list-con'))// toast arg context  next will push into arg
+      new InitEvent(document.querySelector('.swiper-con'), function (path, next) {
+        if (!window.swiper.drag) {
+          // toast
+          window.toast.check(window.config, path, that.target, next);
+        }
+      })
     };
   },
   _initHead: function () {
