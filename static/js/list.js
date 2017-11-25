@@ -19,7 +19,7 @@ window.list = { // init render & will append list-con into body
     var result = '<div class="item container" data-path="' + item.path + '">' +
       '<div class="item-tit"data-path="' + item.path + '">' +item.title + tips + '</div>' +
       '<div class="item-text"data-path="' + item.path + '">' + item.description +
-      '</div><div class="item-footer"data-path="' + item.path + '">' + tips + '</div></div>';
+      '</div><div class="item-footer border-top"data-path="' + item.path + '">' + tips + '</div></div>';
     return result
   },
   _getTips: function (tips) {

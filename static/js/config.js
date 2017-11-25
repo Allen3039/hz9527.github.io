@@ -6,16 +6,25 @@ window.config = [
     keyWords: ['canvas', 'rollup', '文字识别'], // for search
     tips: ['demo', 'canvas'], // tips of this project
     title: 'rollup打包的canvas demo', // title of project
-    description: '自动识别用户输入文案以canvas绘制该文案', // description for this project
+    description: '自动识别用户输入文案以canvas绘制该文案，使用rollup打包，未使用框架或库', // description for this project
     swiper: 1
   },
   {
-    path: '/timerunning',
-    target: 'pc', // pc or phone or all & toast will warning
-    keyWords: ['canvas', 'rollup', '文字识别'], // for search
-    tips: ['demo', 'canvas'], // tips of this project
-    title: 'test', // title of project
-    description: 'hehehehehehehehh', // description for this project
+    path: '/useful_code',
+    target: 'phone', // pc or phone or all & toast will warning
+    keyWords: ['code', 'base', '代码片段'], // for search
+    tips: ['code', 'useful', 'loader'], // tips of this project
+    title: '收集一些有用的代码片段', // title of project
+    description: '收集一些常用的代码片段，项目除了本身意义外，项目使用了vue搭建，并使用node封装一个简单的模版引擎，将md文件自动转成vue并在router配置中插入生成的页面', // description for this project
     swiper: 2
+  },
+  {
+    path: '/vue_demo',
+    target: 'pc', // pc or phone or all & toast will warning
+    keyWords: ['vue', 'vueApi'], // for search
+    tips: ['vue', 'vue api'], // tips of this project
+    title: '收集一些vue不常用不常见但可能很有用的api', // title of project
+    description: '收集一些vue不常用不常见但可能很有用的api，如v-model指令，sync修饰符等', // description for this project
+    swiper: 3
   }
 ]

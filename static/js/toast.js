@@ -3,7 +3,7 @@ window.toast = {
   check: function (config, path, target, next) {
     if (!('path' in this.cache)) {
       for (var i = 0; i < config.length; i++) {
-        if (config.path === path) {
+        if (config[i].path === path) {
           this.cache[path] = {
             target: config[i].target
           }
@@ -11,7 +11,7 @@ window.toast = {
         }
       }
     }
-    if (this.cache[path] === target) {
+    if (this.cache[path].target === target) {
       next();
     } else {
       this._render(this._getText(this.cache[path]), next);
@@ -48,7 +48,7 @@ window.toast = {
   },
   _getTem: function (text) {
     return '<div class="toast-panel"><div class="toast-text">'+ text +
-    '</div><div class="toast-footer"><span class="toast-cancel" data-exec="cancel">取消</span>' +
+    '</div><div class="toast-footer border-top"><span class="toast-cancel" data-exec="cancel">取消</span>' +
     '<span class="toast-confirm" data-exec="confirm">确认</span></div></div>'
   },
   _getText: function (target) {

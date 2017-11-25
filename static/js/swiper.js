@@ -14,20 +14,43 @@ window.swiper = {
   init: function (config, target) { // target pc phone
     var list = this._initList(config);
     if (list) {
+      this.width = window.innerWidth;
       this.render(list, target);
       if (list.length > 1) {
-        this.length = list.length
+        this.length = list.length;
+        this.stepWidth = parseInt(this.width / this.moveTime * this.stepTime);
         this._initAnimation(target, list.length * this.width);
       }
+    }
+  },
+  reset: function () {
+    var that = this;
+    this.width = window.innerWidth;
+    var list = document.querySelector('.swiper-list');
+    list.style.width =  this.length * this.width + 'px';
+    list.querySelectorAll('.swiper-item').forEach(function (item) {
+      item.style.width = that.width + 'px';
+    });
+    this._move(list, true, true);
+    if (this.timer) {
+      clearTimeout(this.timer)
+      this.timer = null;
+      this.wait(list);
+    } else {
+      this.wait(list);
     }
   },
   render: function (list, target) {
     var colorList = this.colors.slice().sort(function () {return Math.random() - 0.5});
     var con = '';
-    this.width = window.innerWidth;
+    var ind = [];
     for (var i = 0; i < list.length; i++) {
       con += this._getItem(list[i], target, colorList[i], this.width);
+      ind.push('');
     }
+    ind = ind.join('</span><span class="">');
+    ind = '<div class="swiper-footer"><span class="swiper-active">' + ind + '</span></div>';
+    con = '<div class="swiper-list">' + con + '</div>' + ind;
     var content = document.querySelector('.swiper-con');
     if (!content) {
       content = document.createElement('div');
@@ -38,12 +61,11 @@ window.swiper = {
     } else {
       content.innerHTML = con;
     }
-    content.style.width =  list.length * this.width + 'px';
+    content.querySelector('.swiper-list').style.width =  list.length * this.width + 'px';
   },
   _initAnimation: function (target) {
-    var dom = document.querySelector('.swiper-con');
+    var dom = document.querySelector('.swiper-list');
     this._initEvent(dom, target);
-    this.stepWidth = parseInt(this.width / this.moveTime * this.stepTime);
     this.wait(dom);
   },
   move: function (dom) {
@@ -74,14 +96,6 @@ window.swiper = {
     var that = this;
     var sx;
     if (target === 'pc') {
-      dom.onmousedown = function (e) {
-        if (that.timer && e.buttons === 1) {
-          clearTimeout(that.timer);
-          that.timer = null;
-          sx = e.clientX;
-          that.drag = true;
-        }
-      }
       document.addEventListener('mouseup', function () {
         if (!that.timer) {
           that.timer = setTimeout(function () {
@@ -91,8 +105,14 @@ window.swiper = {
         }
       });
       dom.onmousemove = function (e) {
-        if (that.drag && e.buttons === 1) {
-          that._move(dom, sx - e.clientX);
+        if (e.buttons === 1) {
+          if (!that.drag) {
+            clearTimeout(that.timer);
+            that.timer = null;
+            that.drag = true;
+          } else {
+            that._move(dom, sx - e.clientX);
+          }
           sx = e.clientX;
         }
       }
@@ -117,19 +137,19 @@ window.swiper = {
       dom.addEventListener('touchcancel', end);
     }
   },
-  _move: function (dom, m) { // m move or fix Number Boolean
-    var tWidth = this.length * this.width;
+  _move: function (dom, m, ind) { // m move or fix Number Boolean
     if (typeof m === 'number') {
       this.transX += m;
+      var tWidth = this.length * this.width;
       // 如果<0将最后一项移到最前方；<-width移动整体； >tWidth-width将第一项移到最后；>tWidth移动整体
       if (this.transX < 0 && this.hasMove !== -1) {
-        this.hasMove = -1
+        this.hasMove = -1;
         this._moveItem(dom.lastChild, -tWidth);
       } else if (this.transX <= -this.width && this.hasMove !== 0) {
         this.hasMove = 0;
         this._moveItem(dom.lastChild, 0);
         this.transX = tWidth - this.width;
-      } else if (this.transX > tWidth - this.width && this.hasMove !== 1) {
+      } else if (this.transX > (tWidth - this.width) && this.hasMove !== 1) {
         this.hasMove = 1;
         this._moveItem(dom.firstChild, tWidth);
       } else if (this.transX >= tWidth && this.hasMove !== 0) {
@@ -138,10 +158,18 @@ window.swiper = {
         this.transX = 0;
       }
     } else { // 从右往左 计算index
-      if (this.transX < 0 || this.transX > tWidth - this.width) {
-        this.index = 0;
-      } else {
-        this.index = Math.ceil(this.transX / this.width);
+      if (!ind) {
+        // alert(this.transX + ':' + (this.length - 1) * this.width)
+        // remove index
+        var spanList = document.querySelectorAll('.swiper-con .swiper-footer span');
+        spanList[this.index].classList.toggle('swiper-active');
+        if (this.transX < 0 || this.transX > tWidth - this.width) {
+          this.index = 0;
+        } else {
+          this.index = Math.ceil(this.transX / this.width);
+          this.index = this.index >= this.length ? 0 : this.index;
+        }
+        spanList[this.index].classList.toggle('swiper-active');
       }
       this.transX = this.width * this.index;
       if (this.hasMove !== 0) {
