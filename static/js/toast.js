@@ -1,7 +1,7 @@
 window.toast = {
   cache: {},
   check: function (config, path, target, next) {
-    if (!('path' in this.cache)) {
+    if (!(path in this.cache)) {
       for (var i = 0; i < config.length; i++) {
         if (config[i].path === path) {
           this.cache[path] = {

@@ -7,10 +7,10 @@ function InitEvent (el, cb, arg, context) {
         window.location = 'https://hz9527.github.io' + path;
       }
       if (typeof cb === 'function') {
-        arg = arg || [];
-        arg.push(path);
-        arg.push(next);
-        cb.apply(context, arg);
+        var args = arg || [];
+        args.push(path);
+        args.push(next);
+        cb.apply(context, args);
       } else {
         next();
       }
