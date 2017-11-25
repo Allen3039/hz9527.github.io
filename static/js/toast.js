@@ -1,7 +1,7 @@
 window.toast = {
   cache: {},
   check: function (config, path, target, next) {
-    if (!(path in this.cache)) {
+    if (!this.cache[path]) {
       for (var i = 0; i < config.length; i++) {
         if (config[i].path === path) {
           this.cache[path] = {
@@ -11,23 +11,23 @@ window.toast = {
         }
       }
     }
-    if (this.cache[path].target === target) {
+    if (this.cache[path].target === 'all' || this.cache[path].target === target) {
       next();
     } else {
-      this._render(this._getText(this.cache[path]), next);
+      this._render(this._getText(this.cache[path].target), next);
     }
   },
   _render: function (text, next) {
     var content = document.querySelector('.toast-con');
-    if (content) {
-      content.querySelector('.toast-text').innerHTML = text;
-    } else {
+    if (!content) {
       content = document.createElement('div');
       content.className = 'toast-con';
       content.style.display = 'none';
       content.innerHTML = this._getTem(text);
       document.querySelector('body').appendChild(content);
       this._initEvent(content, next);
+    } else {
+      content.querySelector('.toast-text').innerHTML = text;
     }
     this.next = next;
     content.style.display = 'block';
@@ -43,6 +43,7 @@ window.toast = {
         } else {
           dom.style.display = 'none';
         }
+        that.next = null;
       }
     }
   },
