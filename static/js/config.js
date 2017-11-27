@@ -26,5 +26,14 @@ window.config = [
     title: '收集一些vue不常用不常见但可能很有用的api', // title of project
     description: '收集一些vue不常用不常见但可能很有用的api，如v-model指令，sync修饰符等', // description for this project
     swiper: 3
+  },
+  {
+    path: '/myBooks',
+    target: 'pc', // pc or phone or all & toast will warning
+    keyWords: ['book', 'gitbook', 'note'], // for search
+    tips: ['book', 'notes'], // tips of this project
+    title: 'myBooks', // title of project
+    description: '各种前端笔记包含基础，如js，css，es6等；框架如vue等，工程化等等相关笔记', // description for this project
+    swiper: -1
   }
 ]
