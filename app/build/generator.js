@@ -19,7 +19,7 @@ function handler (file, callback) {
             let tips = str.match(/<b\s+class\s?=\s?['"]\s?kw\s?['"]\s?>.+?<\/b>/g)
             tips = (tips || ['']).map(item => item.replace(/<b\s+class\s?=\s?['"]\s?kw\s?['"]\s?>/, '').replace('</b>', ''))
             let time = +fs.statSync(p).ctime
-            resolve({title, type, tips, time})
+            resolve({title, type, tips, time, file})
           })
         }))).then(resList => {
           resList.sort((pre, next) => pre.time - next.time)
