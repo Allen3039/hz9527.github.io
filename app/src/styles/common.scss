@@ -1,0 +1,44 @@
+@import './variable.scss';
+html, body {
+  height: 100%;
+  color: $main-c;
+}
+#app {
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+}
+.menu {
+  width: 200px;
+  height: 100%;
+  overflow: auto;
+  border-right: 1px solid $border-c;
+}
+.content {
+  flex-grow: 1;
+  box-sizing: border-box;
+  height: 100%;
+  overflow: auto;
+  padding: 10px;
+  h2 {
+    margin-bottom: 10px;
+    padding: 10px;
+    background: $bg-c;
+  }
+  .type {
+    color: $light-c;
+    &:before {
+      content: '文章类型：';
+      color: $main-c;
+    }
+  }
+  .kw {
+    display: inline-block;
+    margin: 5px;
+    padding: 0 5px;
+    font-size: 12px;
+    border: 1px solid $tip-c;
+    border-radius: 8px;
+    color: $tip-c;
+  }
+}

@@ -17,14 +17,7 @@ export default {
 }
 </script>
 
-<style lang='scss' scoped>
-  #app {
-    display: flex;
-  }
-  .menu {
-
-  }
-  .content {
-
-  }
+<style lang='scss'>
+@import './styles/reset.scss';
+@import './styles/common.scss';
 </style>

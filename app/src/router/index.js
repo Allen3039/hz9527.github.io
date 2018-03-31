@@ -3,10 +3,12 @@ import Router from 'vue-router'
 import config from './config.js'
 
 Vue.use(Router)
-
 export default new Router({
   routes: config.map(item => ({
-    path: '/',
+    path: '/' + item.time,
     component: () => import(`../pages/${item.file}`)
-  }))
+  })).concat({
+    path: '*',
+    redirect: '/' + config[0].time
+  })
 })
