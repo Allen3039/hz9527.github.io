@@ -42,3 +42,12 @@ html, body {
     color: $tip-c;
   }
 }
+
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.match-kw {
+  color: $tip-c;
+}

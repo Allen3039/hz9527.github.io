@@ -1,10 +1,11 @@
 <template lang="html">
   <div class="menu" @click='handlerClick'>
     <div class='menu-tit'>目录</div>
+    <Serach class='menu-search' />
     <div class="item" v-for='(item, ind) in menu' :key='item.key'>
       <div :class="['item-type', item.unwind ? 'item-type-up' : '']" :data-ind='ind'>{{item.key}}</div>
       <div class="item-con" v-show='item.unwind'>
-        <div :class="['item-tit', curItem === '/' + info.time ? 'item-cur' : '']"
+        <div :class="['item-tit ellipsis', curItem === '/' + info.time ? 'item-cur' : '']"
           v-for='info in item.list' :key='info.time' :data-time="info.time">
           {{info.title}}
         </div>
@@ -15,6 +16,7 @@
 
 <script>
 import Config from '../router/config.js'
+import Serach from './search.vue'
 const MenuConf = new Map(['js', 'css', '框架', '工程化', '踩坑', '其他'].map((key, i) => [key, -i - 1]))
 const MenuDefault = '其他'
 export default {
@@ -56,7 +58,7 @@ export default {
         if (ind < 0) {
           result[-ind - 1] = {
             key: type,
-            unwind: false,
+            unwind: true,
             list: [item]
           }
           MenuConf.set(type, -ind - 1)
@@ -66,6 +68,9 @@ export default {
       })
       return result.filter(item => item)
     }
+  },
+  components: {
+    Serach
   }
 }
 </script>
@@ -75,8 +80,11 @@ export default {
   .menu {
     .menu-tit {
       padding: 10px 0;
-      border-bottom: 1px solid $border-c;
       text-align: center;
+    }
+    .menu-search {
+      width: 80%;
+      margin: 0 auto 10px auto;
     }
   }
   .item {
@@ -103,6 +111,9 @@ export default {
         transform: rotate(135deg);
         transform-origin: 71.5% 28.5%;
       }
+      &:first-child {
+        border-top: 1px solid $border-c;
+      }
     }
     .item-type-up {
       &:after {
@@ -112,9 +123,6 @@ export default {
     .item-tit {
       padding: 5px;
       margin-left: 15px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
       border-bottom: 1px solid $border-c;
       &:last-child {border-bottom-width: 0;}
     }
