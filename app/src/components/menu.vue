@@ -2,14 +2,19 @@
   <div class="menu" @click='handlerClick'>
     <div class='menu-tit'>目录</div>
     <Serach class='menu-search' />
-    <div class="item" v-for='(item, ind) in menu' :key='item.key'>
-      <div :class="['item-type', item.unwind ? 'item-type-up' : '']" :data-ind='ind'>{{item.key}}</div>
-      <div class="item-con" v-show='item.unwind'>
-        <div :class="['item-tit ellipsis', curItem === '/' + info.time ? 'item-cur' : '']"
-          v-for='info in item.list' :key='info.time' :data-time="info.time">
-          {{info.title}}
+    <div class="menu-con">
+      <div class="item" v-for='(item, ind) in menu' :key='item.key'>
+        <div :class="['item-type', item.unwind ? 'item-type-up' : '']" :data-ind='ind'>{{item.key}}</div>
+        <div class="item-con" v-show='item.unwind'>
+          <div :class="['item-tit ellipsis', curItem === '/' + info.time ? 'item-cur' : '']"
+            v-for='info in item.list' :key='info.time' :data-time="info.time">
+            {{info.title}}
+          </div>
         </div>
       </div>
+    </div>
+    <div class="menu-footer">
+      design by hz
     </div>
   </div>
 </template>
@@ -78,6 +83,12 @@ export default {
 <style lang="scss" scoped>
   @import '../styles/variable.scss';
   .menu {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    .menu-tit, .menu-search, .menu-footer {
+      flex-shrink: 0;
+    }
     .menu-tit {
       padding: 10px 0;
       text-align: center;
@@ -86,16 +97,29 @@ export default {
       width: 80%;
       margin: 0 auto 10px auto;
     }
+    .menu-con {
+      flex-grow: 1;
+      overflow: auto;
+    }
+    .menu-footer {
+      height: 50px;
+      line-height: 50px;
+      background-color: $bg-footer;
+      color: #fff;
+      text-align: center;
+    }
   }
   .item {
     cursor: pointer;
     &:last-child {
-      .item-tit:last-child {border-bottom-width: 1px;}
+      .item-type {border-bottom: 1px solid $border-c;}
+      .item-tit:last-child {border-bottom-color: $border-c;}
     }
     .item-type {
       padding: 5px 0 5px 10px;
       background: $bg-c;
-      border-bottom: 1px solid $border-c;
+      border-top: 1px solid $border-c;
+      border-bottom: 0;
       position: relative;
       &:after {
         content: '';
@@ -111,23 +135,25 @@ export default {
         transform: rotate(135deg);
         transform-origin: 71.5% 28.5%;
       }
-      &:first-child {
-        border-top: 1px solid $border-c;
-      }
     }
     .item-type-up {
+      border-bottom: 1px solid $border-c;
       &:after {
         transform: rotate(-45deg);
       }
     }
     .item-tit {
+      box-sizing: border-box;
       padding: 5px;
       margin-left: 15px;
       border-bottom: 1px solid $border-c;
-      &:last-child {border-bottom-width: 0;}
+      &:last-child {border-bottom-color: transparent;}
+      &:hover {
+        border-left: 2px solid $theme-c;
+      }
     }
     .item-cur {
-      color: #f55;
+      color: $theme-c;
     }
   }
 </style>

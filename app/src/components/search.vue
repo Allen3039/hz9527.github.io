@@ -78,7 +78,7 @@ export default {
       border-radius: 15px;
       border: 1px solid $border-c;
       &:focus {
-        border-color: $tip-c;
+        border-color: $theme-c;
       }
     }
   }
@@ -119,7 +119,7 @@ export default {
       }
       .item-tips {
         border-radius: 8px;
-        border: 1px solid $tip-c;
+        border: 1px solid $theme-c;
       }
     }
   }

@@ -37,9 +37,9 @@ html, body {
     margin: 5px;
     padding: 0 5px;
     font-size: 12px;
-    border: 1px solid $tip-c;
+    border: 1px solid $theme-c;
     border-radius: 8px;
-    color: $tip-c;
+    color: $theme-c;
   }
 }
 
@@ -49,5 +49,5 @@ html, body {
   white-space: nowrap;
 }
 .match-kw {
-  color: $tip-c;
+  color: $theme-c;
 }
