@@ -154,7 +154,7 @@ export default {
         .item-name {border-left-color: $theme-c;}
       }
       .item-name {
-        padding:0 10px;
+        padding:0 6px;
         flex-grow: 1;
         border-left: 2px solid transparent;
       }

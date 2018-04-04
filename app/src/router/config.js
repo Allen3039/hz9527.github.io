@@ -1,1 +1,1 @@
-export default [{"title":"testtesttesttesttesttesttesttesttesttesttest","type":"js","tips":["123"],"time":1522841958045,"file":"test.md"},{"title":"test2","type":"css","tips":["321"],"time":1522842447372,"file":"test2.md"}]
+export default [{"title":"testtesttesttesttesttesttesttesttesttesttest","type":"js","tips":["123"],"time":1522841958045,"file":"test.md"},{"title":"test2","type":"css","tips":["321"],"time":1522842447372,"file":"test2.md"},{"title":"实现一个promise","type":"js","tips":["promise","promise实现"],"time":1522856732390,"file":"promise_polyfill.md"}]

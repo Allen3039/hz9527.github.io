@@ -45,6 +45,12 @@ html, body {
     border-radius: 8px;
     color: $theme-c;
   }
+  blockquote {
+    margin: 10px;
+    padding: 10px 20px;
+    background-color: $bg-c;
+    color: $light-c;
+  }
 }
 
 .ellipsis {
