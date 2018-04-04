@@ -6,9 +6,10 @@
       <div class="item" v-for='(item, ind) in menu' :key='item.key'>
         <div :class="['item-type', item.unwind ? 'item-type-up' : '']" :data-ind='ind'>{{item.key}}</div>
         <div class="item-con" v-show='item.unwind'>
-          <div :class="['item-tit ellipsis', curItem === '/' + info.time ? 'item-cur' : '']"
+          <div :class="['item-tit', curItem === '/' + info.time ? 'item-cur' : '']"
             v-for='info in item.list' :key='info.time' :data-time="info.time">
-            {{info.title}}
+            <span class='item-name ellipsis' :data-time="info.time">{{info.title}}</span>
+            <b class='item-tag' :data-time="info.time" v-show='now - info.time < 1000 * 3600 * 24 * 3'>新</b>
           </div>
         </div>
       </div>
@@ -27,6 +28,7 @@ const MenuDefault = '其他'
 export default {
   data () {
     return {
+      now: Date.now(),
       menu: this.initMenu(),
       curItem: ''
     }
@@ -143,13 +145,29 @@ export default {
       }
     }
     .item-tit {
-      box-sizing: border-box;
-      padding: 5px;
+      display: flex;
+      padding: 5px 10px 5px 0;
       margin-left: 15px;
       border-bottom: 1px solid $border-c;
       &:last-child {border-bottom-color: transparent;}
       &:hover {
-        border-left: 2px solid $theme-c;
+        .item-name {border-left-color: $theme-c;}
+      }
+      .item-name {
+        padding:0 10px;
+        flex-grow: 1;
+        border-left: 2px solid transparent;
+      }
+      .item-tag {
+        flex-shrink: 0;
+        width: 18px;
+        height: 18px;
+        font-size: 12px;
+        text-align: center;
+        line-height: 18px;
+        border: 1px solid $theme-c;
+        border-radius: 50%;
+        color: $theme-c;
       }
     }
     .item-cur {

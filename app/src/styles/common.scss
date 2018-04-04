@@ -25,12 +25,16 @@ html, body {
     padding: 10px;
     background: $bg-c;
   }
-  .type {
+  .update-time, .type {
+    margin-right: 10px;
     color: $light-c;
     &:before {
-      content: '文章类型：';
+      content: '更新时间：';
       color: $main-c;
     }
+  }
+  .type:before {
+    content: '文章类型：';
   }
   .kw {
     display: inline-block;

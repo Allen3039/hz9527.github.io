@@ -6,6 +6,11 @@ import router from './router'
 
 Vue.config.productionTip = false
 
+Vue.filter('formatTime', v => {
+  let time = new Date(v)
+  return `${time.getFullYear()}-${time.getMonth() + 1}-${time.getDate()} ${time.getHours()}:${time.getMinutes()}`
+})
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
