@@ -1,5 +1,5 @@
 ## 实现一个promise
-<b class='update-time'>{{1522909332495 | formatTime}}</b>
+<b class='update-time'>{{1522937816046 | formatTime}}</b>
 <b class='type'>js</b>
 <b class='kw'>promise</b> <b class='kw'>promise实现</b>
 
@@ -75,4 +75,83 @@ new Promise(r => {
 // 当then／catch未处理会一直传递直到被处理（值穿透问题）
 ```
 
-### promise构造函数实现
+### Promise构造函数基础实现
+> 以示区分，使用`MyPromise`，本节仅实现`new MyPromise`,`then`,`catch`
+
+**大致代码**
+```JavaScript
+function MyPromise (exector) {
+  let resolve // ...
+  let reject // ...
+  exector(resolve, reject)
+}
+MyPromise.prototype.then = function (onResolved, onRejected) {
+  // ...
+}
+```
+
+**基本思路**
+1. 在实例调用then时状态不一定确认了，因此可能需要在更改状态时执行
+2. resolve及reject由构造函数实现，函数本身只用于更改状态机和保存数据和执行可能需要执行的监听函数
+3. 状态一旦确认不可变更，因此需要有锁机制，我们定义三种状态，resolved rejected，pending
+4. then、catch返回均是一个新的Promise实例
+5. 在执行resolve前的错误都应该被catch，反之则不应被catch
+6. 在then、catch未传递监听函数应该让新的实例获得其状态及数据
+
+**基本代码**
+```JavaScript
+function MyPromise (exector) {
+  this.status = 'pending'
+  this.onSettled = () => {}
+  exector(
+    data => this._setState('resolved', data),
+    data => this._setState('rejected', data)
+  )
+}
+MyPromise.prototype._setState = function (state, data) {
+  if (this.status === 'pending') {
+    this.status = state
+    this.data = data
+    this.onSettled()
+  }
+}
+MyPromise.prototype.then = function (onResolved, onRejected) {
+  return new Promise((resolve, reject) => {
+    // ...
+  })
+}
+```
+接下来就是then的实现了，注意以下几点：
+1. 返回是promise
+2. 若返回本身也是promise呢？
+3. 值的穿透
+```JavaScript
+MyPromise.prototype.then = function (onResolved, onRejected) {
+  // 若未更改状态则交给更改状态时更改，否则直接执行监听函数
+  // 若监听函数不存在，或不为函数，则传递给返回的promise
+  return new Promise((resolve, reject) => {
+    if (this.status === 'pending') {
+      this.onSettled = () => {
+        this._handlerThen(this.status === 'resolved' ? onResolved : onRejected, resolve, reject)
+      }
+    } else {
+      this._handlerThen(this.status === 'resolved' ? onResolved : onRejected, resolve, reject)
+    }
+  })
+}
+MyPromise.prototype._handlerThen = function (preOnSettled, curResolve, curReject) {
+  if (typeof preOnSettled === 'function') {
+    let result = preOnSettled(this.data)
+    if (result && result.constructor === MyPromise) {
+      result.then(curResolve, curReject)
+    } else {
+      curResolve(result)
+    }
+  } else {
+    this.status === 'resolved' ? curResolve(this.data) : curReject(this.data)
+  }
+}
+```
+
+此时，我们会发现
+promise构造函数基本框架已完成，接下来就是异步、catch错误及catch、finally实现

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>my promise</title>
+  </head>
+  <body>
+    <script type="text/javascript">
+    function MyPromise (exector) {
+      this.status = 'pending'
+      this.onSettled = () => {}
+      exector(
+        data => this._setState('resolved', data),
+        data => this._setState('rejected', data)
+      )
+    }
+    MyPromise.prototype._setState = function (state, data) {
+      if (this.status === 'pending') {
+        this.status = state
+        this.data = data
+        setTimeout(() => {
+          this.onSettled()
+        }, -1)
+      }
+    }
+    MyPromise.prototype.then = function (onResolved, onRejected) {
+      // 若未更改状态则交给更改状态时更改，否则直接执行监听函数
+      // 若监听函数不存在，或不为函数，则传递给返回的promise
+      return new Promise((resolve, reject) => {
+        if (this.status === 'pending') {
+          this.onSettled = () => {
+            this._handlerThen(this.status === 'resolved' ? onResolved : onRejected, resolve, reject)
+          }
+        } else {
+          this._handlerThen(this.status === 'resolved' ? onResolved : onRejected, resolve, reject)
+        }
+      })
+    }
+    MyPromise.prototype._handlerThen = function (preOnSettled, curResolve, curReject) {
+      if (typeof preOnSettled === 'function') {
+        let result = preOnSettled(this.data)
+        if (result && result.constructor === MyPromise) {
+          result.then(curResolve, curReject)
+        } else {
+          curResolve(result)
+        }
+      } else {
+        this.status === 'resolved' ? curResolve(this.data) : curReject(this.data)
+      }
+    }
+    let test = new MyPromise(r => {
+      r(1)
+    }).then(r => {
+      console.log(r)
+      return new MyPromise(r => {
+        r(2)
+      })
+    }).then(r => {
+      console.log(2)
+    })
+    </script>
+  </body>
+</html>
