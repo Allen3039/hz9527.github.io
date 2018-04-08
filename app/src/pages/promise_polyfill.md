@@ -123,8 +123,7 @@ MyPromise.prototype.then = function (onResolved, onRejected) {
 ```
 接下来就是then的实现了，注意以下几点：
 1. 返回是promise
-2. 若返回本身也是promise呢？
-3. 值的穿透
+2. 值的穿透
 ```JavaScript
 MyPromise.prototype.then = function (onResolved, onRejected) {
   // 若未更改状态则交给更改状态时更改，否则直接执行监听函数
@@ -153,5 +152,23 @@ MyPromise.prototype._handlerThen = function (preOnSettled, curResolve, curReject
 }
 ```
 
-此时，我们会发现
 promise构造函数基本框架已完成，接下来就是异步、catch错误及catch、finally实现
+1. 利用值的穿透、then来实现catch、finally
+2. catch哪里？
+3. 何时异步？
+
+```JavaScript
+// 利用值的穿透实现
+MyPromise.prototype.catch = function (onRejected) {
+  return this.then(null, onRejected)
+}
+MyPromise.prototype.finally = function (onSettled) {
+  return this.then(onSettled, onSettled)
+}
+
+//
+```
+
+第一版promise基本完成，但是还有很多和[标准](https://promisesaplus.com/)不一致的地方，那么思考下如何实现一个更为严谨的promise构造函数
+
+### Promise构造函数进阶实现

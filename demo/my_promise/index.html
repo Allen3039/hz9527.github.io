@@ -18,9 +18,7 @@
       if (this.status === 'pending') {
         this.status = state
         this.data = data
-        setTimeout(() => {
-          this.onSettled()
-        }, -1)
+        this.onSettled()
       }
     }
     MyPromise.prototype.then = function (onResolved, onRejected) {
@@ -55,7 +53,7 @@
       return new MyPromise(r => {
         r(2)
       })
-    }).then(r => {
+    }).then().then(r => {
       console.log(2)
     })
     </script>
