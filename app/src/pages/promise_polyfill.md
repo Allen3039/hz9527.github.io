@@ -1,5 +1,5 @@
 ## 实现一个promise
-<b class='update-time'>{{1522937816046 | formatTime}}</b>
+<b class='update-time'>{{1523712243719 | formatTime}}</b>
 <b class='type'>js</b>
 <b class='kw'>promise</b> <b class='kw'>promise实现</b>
 
@@ -166,9 +166,19 @@ MyPromise.prototype.finally = function (onSettled) {
   return this.then(onSettled, onSettled)
 }
 
-//
+// 在resolve后的错误不应该被catch，因此需要catch的地方就是exector及onResolved
 ```
 
-第一版promise基本完成，但是还有很多和[标准](https://promisesaplus.com/)不一致的地方，那么思考下如何实现一个更为严谨的promise构造函数
+然后就是构造函数方法的实现Promise.resolve,Promise.reject,Promise.all,Promise.race及一些校验
+
+```JavaScript
+```
+
+第一版promise基本完成，但是还有很多和[标准](https://promisesaplus.com/)不一致的地方，代码如下：
+
+```JavaScript
+```
+
+那么思考下如何实现一个更为严谨的promise构造函数  
 
 ### Promise构造函数进阶实现

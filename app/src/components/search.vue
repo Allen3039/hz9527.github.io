@@ -108,10 +108,14 @@ export default {
     &:last-child {
       border-bottom: 0;
     }
+    .item-tit {
+      margin-bottom: 5px;
+    }
     .item-info {
       font-size: 12px;
       .item-type, .item-tips {
         display: inline-block;
+        margin-right: 3px;
         padding: 0px 5px;
       }
       .item-type {
