@@ -9,11 +9,11 @@ function getReg (className, tagName = 'b', group = false) {
 
 function getTags (className, str, tagName = 'b') {
 	let reg = getReg(className, tagName, true)
-	return (str.match(reg) || ['']).map(item => item.replace(reg, (sub, $1, $2) => $2))
+	return (str.match(reg) || ['']).map(item => item.replace(reg, '$2'))
 }
 
 function replaceTag (className, str, content, tagName = 'b') {
-	return str.replace(getReg(className, str, tagName, true), (subStr, $1, $2, $3) => ($1 + content + $3))
+	return str.replace(getReg(className, tagName, true), content)
 }
 
 function injectBefore (content, str, reg) {

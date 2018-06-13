@@ -18,7 +18,7 @@ function handlerFile (filePath, shouldupdate = false) {
 			let tips = getTags(KW_CLASS, str)
 			let time = getTags(TIME_CLASS, str)[0].replace(/({{\s*)(\d+)?(.+)?/, '$2')
 			let now = Date.now()
-			if (type && tips && (!time || (shouldupdate && Number(time) < now - 1000 * 60))) {
+			if (type && tips && (!time || (shouldupdate && (now - Number(time) > 1000 * 60)))) {
 				// set time
 				let con = `<b class="${TIME_CLASS}">{{${now} | formatTime}}</b>`
 				let newStr = time ? replaceTag(TIME_CLASS, str, con) : injectBefore(con, str, getReg(TYPE_CLASS))
@@ -59,9 +59,13 @@ async function walkDir (dir) {
 	return result
 }
 
+function getFile (filePath) {
+	return filePath.replace(/(.+?\/src\/pages\/)(.+\.md)/, '$2')
+}
+
 function genConfItem ({title, type, tips, time, file}) {
 	tips = (tips || ['']).join('\', \'')
-	file = file.replace(/(.+?\/src\/pages\/)(.+\.md)/, '$2')
+	file = getFile(file)
 	return `{title: '${title}', type: '${type}', tips: ['${tips}'], time: ${time}, file: '${file}'}`
 }
 
@@ -79,7 +83,7 @@ function operConf (oper, info) {
 		fs.readFile(CONF_PATH, (err, fd) => {
 			if (err) reject(err)
 			let str = fd.toString()
-			let reg = new RegExp(`,*?\n\\t{.+?file:\\s*?["']${info.file}["']\\s*?}`)
+			let reg = new RegExp(`,*?\n\\t{.+?file:\\s*?["']${getFile(info.file)}["']\\s*?}`)
 			let newStr
 			if (oper === 'delete') {
 				newStr = str.replace(reg, '')
@@ -88,7 +92,8 @@ function operConf (oper, info) {
 				if (!item) {
 					newStr = str.replace(/},*?\s]/, `},\n\t${genConfItem(info)}\n]`)
 				} else {
-					newStr = str.replace(reg, genConfItem(info))
+					let ind = item[0][0] === ',' ? ',\n\t' : '\n\t'
+					newStr = str.replace(item[0], ind + genConfItem(info))
 				}
 			}
 			if (newStr !== str) {
@@ -102,7 +107,7 @@ function operConf (oper, info) {
 
 module.exports = function (env) {
 	let nameSet = new Set()
-	if (env === 'prod') {
+	if (env === 'dev') {
 		fs.watch(DIR_PATH, (type, file) => {
 			if (type === 'rename') { // rename maybe add remove rename file, so can remove,del in config
 				if (nameSet.has(file)) { // rename or del. remove in config
@@ -123,7 +128,7 @@ module.exports = function (env) {
 	}
 	return walkDir(DIR_PATH)
 		.then(list => {
-			nameSet = new Set(list.map(item => item.file))
+			nameSet = new Set(list.map(item => getFile(item.file)))
 			// set config
 			return genConfig(list)
 		})
