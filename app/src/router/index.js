@@ -4,12 +4,12 @@ import config from './config.js'
 
 Vue.use(Router)
 export default new Router({
-  mode: 'history',
-  routes: config.map(item => ({
-    path: '/' + item.time,
-    component: () => import(`../pages/${item.file}`)
-  })).concat({
-    path: '*',
-    redirect: '/' + config[0].time
-  })
+	mode: 'history',
+	routes: config.map(item => ({
+		path: '/' + item.time,
+		component: () => import(`../pages/${item.file}`)
+	})).concat({
+		path: '*',
+		redirect: '/' + config[0].time
+	})
 })

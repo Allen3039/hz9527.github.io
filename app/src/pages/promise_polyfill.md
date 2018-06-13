@@ -182,3 +182,4 @@ MyPromise.prototype.finally = function (onSettled) {
 那么思考下如何实现一个更为严谨的promise构造函数  
 
 ### Promise构造函数进阶实现
+test

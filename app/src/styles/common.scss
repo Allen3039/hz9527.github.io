@@ -62,3 +62,60 @@ html, body {
 .match-kw {
   color: $theme-c;
 }
+
+// aside menu
+.aside-menu {
+  position: fixed;
+  top: 100px;
+  right: 20px;
+}
+
+.aside-menu-tit {
+  position: absolute;
+  top: 0;
+  right: 100%;
+  cursor: pointer;
+  background: $theme-c;
+  padding: 5px 3px;
+  color: #fff;
+  opacity: 0.8;
+  &:hover {opacity: 1;}
+}
+
+.aside-menu-con {
+  padding: 10px;
+  max-height: 300px;
+  max-width: 200px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: $bg-aside-menu;
+  border: 1px solide $border-c;
+  opacity: 0.8;
+}
+
+.aside-menu-item {
+  display: block;
+  color: $theme-c;
+  line-height: 1.8;
+  box-sizing: border-box;
+  border-bottom: 1px solid transparent;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  &:hover {border-bottom-color: $theme-c;}
+  &.level-2 {
+    font-size: 14px;
+  }
+  &.level-3 {
+    font-size: 13px;
+    margin-left: 10px;
+  }
+  &.level-4 {
+    font-size: 12px;
+    margin-left: 15px;
+  }
+  &.level-5 {
+    font-size: 11px;
+    margin-left: 20px;
+  }
+}
