@@ -17,16 +17,20 @@ function handlerFile (filePath, shouldupdate = false) {
 			let type = getTags(TYPE_CLASS, str)[0]
 			let tips = getTags(KW_CLASS, str)
 			let time = getTags(TIME_CLASS, str)[0].replace(/({{\s*)(\d+)?(.+)?/, '$2')
-			let now = Date.now()
-			if (type && tips && (!time || (shouldupdate && (now - Number(time) > 1000 * 60)))) {
-				// set time
-				let con = `<b class="${TIME_CLASS}">{{${now} | formatTime}}</b>`
-				let newStr = time ? replaceTag(TIME_CLASS, str, con) : injectBefore(con, str, getReg(TYPE_CLASS))
-				fs.writeFile(filePath, newStr, err => {
-					err ? reject(err) : resolve({title, type, tips, time: now, file: filePath})
-				})
+			if (title && type && tips) {
+				let now = Date.now()
+				if (!time || (shouldupdate && (now - Number(time) > 1000 * 60))) {
+					// set time
+					let con = `<b class="${TIME_CLASS}">{{${now} | formatTime}}</b>`
+					let newStr = time ? replaceTag(TIME_CLASS, str, con) : injectBefore(con, str, getReg(TYPE_CLASS))
+					fs.writeFile(filePath, newStr, err => {
+						err ? reject(err) : resolve({ title, type, tips, time: now, file: filePath })
+					})
+				} else {
+					resolve({ title, type, tips, time, file: filePath })
+				}
 			} else {
-				resolve({title, type, tips, time, file: filePath})
+				resolve(null)
 			}
 		})
 	})
@@ -83,17 +87,21 @@ function operConf (oper, info) {
 		fs.readFile(CONF_PATH, (err, fd) => {
 			if (err) reject(err)
 			let str = fd.toString()
-			let reg = new RegExp(`,*?\n\\t{.+?file:\\s*?["']${getFile(info.file)}["']\\s*?}`)
+			let reg = new RegExp(`\n\\t{.+?file:\\s*?["']${getFile(info.file)}["']\\s*?},*`)
+			let item = str.match(reg)
+			item = (item && item[0]) || null
+			let isLast = (item && item[item.length - 2] !== ',') || false
 			let newStr
 			if (oper === 'delete') {
-				newStr = str.replace(reg, '')
+				if (item) {
+					item = isLast ? ',' + item : item
+					newStr = str.replace(item, '')
+				}
 			} else if (oper === 'update') {
-				let item = str.match(reg)
 				if (!item) {
 					newStr = str.replace(/},*?\s]/, `},\n\t${genConfItem(info)}\n]`)
 				} else {
-					let ind = item[0][0] === ',' ? ',\n\t' : '\n\t'
-					newStr = str.replace(item[0], ind + genConfItem(info))
+					newStr = str.replace(item[0], '\n\t' + genConfItem(info) + isLast ? '' : ',')
 				}
 			}
 			if (newStr !== str) {
@@ -109,25 +117,30 @@ module.exports = function (env) {
 	let nameSet = new Set()
 	if (env === 'dev') {
 		fs.watch(DIR_PATH, (type, file) => {
+			if (!/\.md$/.test(file)) return
+			let needUpdate = false
 			if (type === 'rename') { // rename maybe add remove rename file, so can remove,del in config
 				if (nameSet.has(file)) { // rename or del. remove in config
 					nameSet.delete(file)
 					operConf('delete', {file})
 				} else {
 					nameSet.add(file)
+					needUpdate = true
 				}
 			} else if (type === 'change') {
-				handlerFile(`${DIR_PATH}/${file}`, true)
-					.then(info => {
-						// inset or change it in config
-						if (info.tips && info.type) operConf('update', info)
-					})
-					.catch(err => console.log(err))
+				needUpdate = true
 			}
+			needUpdate && handlerFile(`${DIR_PATH}/${file}`, true)
+				.then(info => {
+					// inset or change it in config
+					if (info) operConf('update', info)
+				})
+				.catch(err => console.log(err))
 		})
 	}
 	return walkDir(DIR_PATH)
 		.then(list => {
+			list = list.filter(item => item)
 			nameSet = new Set(list.map(item => getFile(item.file)))
 			// set config
 			return genConfig(list)
