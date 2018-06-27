@@ -25,6 +25,7 @@ function getTitle (str) {
 }
 
 function genMenu (list) {
+	if (!list) return ''
 	let con = list.map(item => {
 		let level = item.match(/#+/)[0].length
 		let tit = item.replace(/(#+?\s+?)(.+?)(\n)/, '$2')

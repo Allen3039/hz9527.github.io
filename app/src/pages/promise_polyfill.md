@@ -1,5 +1,5 @@
 ## 实现一个promise
-<b class='update-time'>{{1523712243719 | formatTime}}</b>
+<b class="update-time">{{1529199994117 | formatTime}}</b>
 <b class='type'>js</b>
 <b class='kw'>promise</b> <b class='kw'>promise实现</b>
 
@@ -13,8 +13,9 @@
 ### 思考几个问题
 1. Promise函数参数的执行是同步还是异步？
 2. Promise.prototype.then/catch返回？
-3. resolve后代码报错是否会被catch？
-4. Promise未执行的then／catch行为？
+3. 如果返回本身就是一个Promise，那么是否会产生两次异步？
+4. resolve后代码报错是否会被catch？
+5. Promise未执行的then／catch行为？
 
 用以下demo来简单解答这几个问题
 ```JavaScript
@@ -27,7 +28,7 @@ new Promise(r => {
 }).then(r => console.log(3))
 console.log(4)
 // 1 2 4 3
-// Promise函数参数是同步的
+/** Promise函数参数是同步的 */
 
 // Promise.prototype.then/catch返回？
 // 这将决定我们如何设计then／catch返回
@@ -46,7 +47,7 @@ new Promise(r => {
 }).then(r => console.log(5))
 console.log(6)
 // 6 1 2 3 4 5
-// Promise.prototype.then/catch返回同样是异步函数（新的Promise）
+/** Promise.prototype.then/catch返回同样是异步函数（新的Promise）*/
 
 // resolve后代码报错是否会被catch？
 // 这将决定我们如何设计try catch
@@ -59,7 +60,7 @@ new Promise(r => {
   console.log(2, e)
 })
 // 1
-// resolve后的错误并不会被catch
+/** resolve后的错误并不会被catch */
 
 // Promise未执行的then／catch行为？
 // 这将决定我们如何设计then catch默认处理
@@ -72,7 +73,7 @@ new Promise(r => {
   console.log(r)
 })
 // 1
-// 当then／catch未处理会一直传递直到被处理（值穿透问题）
+/** 当then／catch未处理会一直传递直到被处理（值穿透问题）*/
 ```
 
 ### Promise构造函数基础实现
@@ -121,9 +122,12 @@ MyPromise.prototype.then = function (onResolved, onRejected) {
   })
 }
 ```
+
 接下来就是then的实现了，注意以下几点：
 1. 返回是promise
 2. 值的穿透
+
+
 ```JavaScript
 MyPromise.prototype.then = function (onResolved, onRejected) {
   // 若未更改状态则交给更改状态时更改，否则直接执行监听函数

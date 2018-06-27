@@ -99,9 +99,9 @@ function operConf (oper, info) {
 				}
 			} else if (oper === 'update') {
 				if (!item) {
-					newStr = str.replace(/},*?\s]/, `},\n\t${genConfItem(info)}\n]`)
+					newStr = str.replace(/},*?\s*]/, `},\n\t${genConfItem(info)}\n]`)
 				} else {
-					newStr = str.replace(item[0], '\n\t' + genConfItem(info) + isLast ? '' : ',')
+					newStr = str.replace(item, '\n\t' + genConfItem(info) + (isLast ? '' : ','))
 				}
 			}
 			if (newStr !== str) {
