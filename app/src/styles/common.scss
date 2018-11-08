@@ -3,6 +3,7 @@
 html, body {
   height: 100%;
   color: $main-c;
+  line-height: 1.5;
 }
 #app {
   display: flex;
@@ -20,7 +21,7 @@ html, body {
   box-sizing: border-box;
   height: 100%;
   overflow: auto;
-  padding: 10px;
+  padding: 10px 20px;
   h2 {
     margin-bottom: 10px;
     padding: 10px;
@@ -52,6 +53,7 @@ html, body {
     background-color: $bg-c;
     color: $light-c;
   }
+  .show-blog {display: none;}
 }
 
 .ellipsis {

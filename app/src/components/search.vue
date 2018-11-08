@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import Config from '../router/config.js'
+import Config from '../router/getConfig.js'
 import Search from '../utils/search.js'
 const BLUR_TIME = 200
 const TIME = 300

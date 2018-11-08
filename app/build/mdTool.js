@@ -4,6 +4,7 @@ const path = require('path')
 const TYPE_CLASS = 'type'
 const KW_CLASS = 'kw'
 const TIME_CLASS = 'update-time'
+const SHOW_CLASS = 'show-blog'
 const DIR_PATH = path.join(__dirname, '../src/pages')
 const CONF_PATH = path.join(__dirname, '../src/router/config.js')
 
@@ -17,6 +18,7 @@ function handlerFile (filePath, shouldupdate = false) {
 			let type = getTags(TYPE_CLASS, str)[0]
 			let tips = getTags(KW_CLASS, str)
 			let time = getTags(TIME_CLASS, str)[0].replace(/({{\s*)(\d+)?(.+)?/, '$2')
+			let show = getTags(SHOW_CLASS, str)[0] === 'true'
 			if (title && type && tips) {
 				let now = Date.now()
 				if (!time || (shouldupdate && (now - Number(time) > 1000 * 60))) {
@@ -24,10 +26,10 @@ function handlerFile (filePath, shouldupdate = false) {
 					let con = `<b class="${TIME_CLASS}">{{${now} | formatTime}}</b>`
 					let newStr = time ? replaceTag(TIME_CLASS, str, con) : injectBefore(con, str, getReg(TYPE_CLASS))
 					fs.writeFile(filePath, newStr, err => {
-						err ? reject(err) : resolve({ title, type, tips, time: now, file: filePath })
+						err ? reject(err) : resolve({ title, type, tips, time: now, file: filePath, show })
 					})
 				} else {
-					resolve({ title, type, tips, time, file: filePath })
+					resolve({ title, type, tips, time, file: filePath, show })
 				}
 			} else {
 				resolve(null)
@@ -67,10 +69,10 @@ function getFile (filePath) {
 	return filePath.replace(/(.+?\/src\/pages\/)(.+\.md)/, '$2')
 }
 
-function genConfItem ({title, type, tips, time, file}) {
+function genConfItem ({title, type, tips, time, file, show}) {
 	tips = (tips || ['']).join('\', \'')
 	file = getFile(file)
-	return `{title: '${title}', type: '${type}', tips: ['${tips}'], time: ${time}, file: '${file}'}`
+	return `{title: '${title}', type: '${type}', tips: ['${tips}'], time: ${time}, file: '${file}', show: ${show}}`
 }
 
 function genConfig (infoList, filePath = CONF_PATH) {

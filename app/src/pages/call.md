@@ -1,6 +1,6 @@
 ## call、apply、bind简单实现
 
-<b class="update-time">{{1541634698160 | formatTime}}</b><b class='type'>js</b>
+<b class="update-time">{{1541691883074 | formatTime}}</b><b class='type'>js</b>
 <b class='kw'>call实现</b> <b class='kw'>apply实现</b> <b class='kw'>bind实现</b>
 
 ### bind实现
@@ -65,6 +65,33 @@ test.myCall(null, 1, 2, 3);
 
 > 这里还是不严格，一方面是缺乏对调用 call 方法的缺少判断，其次是没有处理 null这种情况。在严格模式下，如果第一个参数为 null， this 指向 null。
 
+关于报错的细节我们先不去研究，可以尝试 this 指向 null 和 undefined
+```js
+Function.prototype.myCall = function () {
+  var obj = arguments[0] || window;
+  var args = [];
+  var i = 1;
+  while (i < arguments.length) {
+    args.push('arguments[' + i++ + ']');
+  }
+  obj.fn = this;
+  if (arguments[0] === null) {
+    obj.fn
+  }
+  var result = eval('obj.fn(' + args + ')');
+  delete obj.fn;
+  return result;
+}
+// test
+function test() {
+  console.log(arguments);
+  return 'test';
+}
+
+test.call(null, 1, 2, 3);
+test.myCall(null, 1, 2, 3);
+```
+
 ### 拓展
 
 由于数组的 concat 方法会返回新数组，但是我们经常希望直接更改原数组，所以只能再次赋值
@@ -89,3 +116,5 @@ Function.prototype.construct = function (aArgs) {
 [call和apply的性能对比](https://github.com/noneven/__/issues/6)  
 [使用Function构造器生成的函数，并不会在创建它们的上下文中创建闭包](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function)  
 [JavaScript深入之call和apply的模拟实现](https://github.com/mqyqingfeng/Blog/issues/11)
+
+<b class="show-blog">true</b>

@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import Config from '../router/config.js'
+import Config from '../router/getConfig.js'
 import Serach from './search.vue'
 const MenuConf = new Map(['js', 'css', '框架', '工程化', '踩坑', '其他'].map((key, i) => [key, -i - 1]))
 const MenuDefault = '其他'
