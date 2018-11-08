@@ -87,7 +87,7 @@ function operConf (oper, info) {
 		fs.readFile(CONF_PATH, (err, fd) => {
 			if (err) reject(err)
 			let str = fd.toString()
-			let reg = new RegExp(`\n\\t{.+?file:\\s*?["']${getFile(info.file)}["']\\s*?},*`)
+			let reg = new RegExp(`\n\\t{.+?file:\\s*?["']${getFile(info.file)}["']\\s*?},*?`)
 			let item = str.match(reg)
 			item = (item && item[0]) || null
 			let isLast = (item && item[item.length - 2] !== ',') || false
