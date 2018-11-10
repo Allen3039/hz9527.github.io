@@ -1,0 +1,24 @@
+{
+  "name": "axios",
+  "version": "1.0.0",
+  "description": "",
+  "main": "Axios.js",
+  "scripts": {
+    "watch": "node ./build/dev.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "rollup": "^0.67.0",
+    "rollup-plugin-babel": "^4.0.3"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.1.5",
+    "@babel/plugin-proposal-class-properties": "^7.1.0",
+    "@babel/plugin-proposal-decorators": "^7.1.2",
+    "@babel/preset-env": "^7.1.5",
+    "rollup-plugin-commonjs": "^9.2.0",
+    "rollup-plugin-node-resolve": "^3.4.0"
+  }
+}

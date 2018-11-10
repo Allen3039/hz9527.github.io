@@ -5,6 +5,18 @@ html, body {
   color: $main-c;
   line-height: 1.5;
 }
+details {
+  margin: 10px 0;
+  summary {
+    cursor: pointer;
+    &:hover {
+      color: $theme-c;
+    }
+    &:focus {
+      outline: none;
+    }
+  }
+}
 #app {
   display: flex;
   height: 100%;

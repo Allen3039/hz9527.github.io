@@ -69,10 +69,15 @@ function getFile (filePath) {
 	return filePath.replace(/(.+?\/src\/pages\/)(.+\.md)/, '$2')
 }
 
+function safeStr (str) {
+	return typeof str === 'string' ? str.replace(/['"]/g, '\\$&') : str
+}
+
 function genConfItem ({title, type, tips, time, file, show}) {
-	tips = (tips || ['']).join('\', \'')
+	tips = (tips || ['']).map(safeStr)
+	tips = tips.join('\', \'')
 	file = getFile(file)
-	return `{title: '${title}', type: '${type}', tips: ['${tips}'], time: ${time}, file: '${file}', show: ${show}}`
+	return `{title: '${safeStr(title)}', type: '${safeStr(type)}', tips: ['${tips}'], time: ${time}, show: ${show}, file: '${safeStr(file)}'}`
 }
 
 function genConfig (infoList, filePath = CONF_PATH) {
@@ -89,7 +94,8 @@ function operConf (oper, info) {
 		fs.readFile(CONF_PATH, (err, fd) => {
 			if (err) reject(err)
 			let str = fd.toString()
-			let reg = new RegExp(`\n\\t{.+?file:\\s*?["']${getFile(info.file)}["']\\s*?},*?`)
+			// 需要将 file 放在最后一个字段！！！
+			let reg = new RegExp(`\\n\\t{.+?file:\\s*?["']${getFile(info.file)}["']\\s*?},*?`)
 			let item = str.match(reg)
 			item = (item && item[0]) || null
 			let isLast = (item && item[item.length - 2] !== ',') || false

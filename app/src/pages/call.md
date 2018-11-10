@@ -63,34 +63,8 @@ test.call(null, 1, 2, 3);
 test.myCall(null, 1, 2, 3);
 ```
 
-> 这里还是不严格，一方面是缺乏对调用 call 方法的缺少判断，其次是没有处理 null这种情况。在严格模式下，如果第一个参数为 null， this 指向 null。
+> 这里还是不严格，一方面是缺乏对调用 call 方法的缺少判断及 fn 覆盖问题，其次是需要注意 apply 第二个参数需要有 length 属性，最后是没有处理 null这种情况。在严格模式下，如果第一个参数为 null， this 指向 null。
 
-关于报错的细节我们先不去研究，可以尝试 this 指向 null 和 undefined
-```js
-Function.prototype.myCall = function () {
-  var obj = arguments[0] || window;
-  var args = [];
-  var i = 1;
-  while (i < arguments.length) {
-    args.push('arguments[' + i++ + ']');
-  }
-  obj.fn = this;
-  if (arguments[0] === null) {
-    obj.fn
-  }
-  var result = eval('obj.fn(' + args + ')');
-  delete obj.fn;
-  return result;
-}
-// test
-function test() {
-  console.log(arguments);
-  return 'test';
-}
-
-test.call(null, 1, 2, 3);
-test.myCall(null, 1, 2, 3);
-```
 
 ### 拓展
 
