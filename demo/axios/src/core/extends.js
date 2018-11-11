@@ -1,0 +1,3 @@
+function extends(fn, target) {
+  
+}

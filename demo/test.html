@@ -7,7 +7,7 @@
     function printH2() {
         var i = 0;
         while (i++ < 10000000) {}
-        console.log('first script', document.querySelectorAll('h2'));
+        console.log('first script', document.querySelectorAll('link'));
     }
     function console2 (v) {
       var i = 0;
@@ -16,12 +16,12 @@
     }
     function runProm() {
       Promise.resolve()
-        .then(printH2)
+        .then(console2)
     }
     runProm();
-    printH2()
+    // printH2()
     console2(1)
-    setTimeout(printH2)
+    // setTimeout(printH2)
     </script>
     <script>
     console2('second script');
