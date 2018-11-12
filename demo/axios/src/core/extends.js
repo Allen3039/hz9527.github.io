@@ -1,3 +1,0 @@
-function extends(fn, target) {
-  
-}
