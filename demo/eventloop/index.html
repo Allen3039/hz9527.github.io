@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>event loop</title>
+    <style media="screen">
+      div {
+        width: 300px;
+        height: 300px;
+        background: #f55;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="outer"><div class="inner"></div></div>
+    <script type="text/javascript">
+    var outer = document.querySelector('.outer');
+    var inner = document.querySelector('.inner');
+
+    // 给 outer 添加一个观察者
+    new MutationObserver(function() {
+    console.log('mutate');
+    }).observe(outer, {
+    attributes: true
+    });
+
+    // click 回调函数
+    function onClick() {
+    console.log('click');
+
+    setTimeout(function() {
+      console.log('timeout');
+    }, 0);
+
+    Promise.resolve().then(function() {
+      console.log('promise');
+    }).then(() => console.log('promise2'))
+
+    outer.setAttribute('data-random', Math.random());
+    }
+
+    inner.addEventListener('click', onClick);
+    outer.addEventListener('click', onClick);
+    </script>
+  </body>
+</html>
