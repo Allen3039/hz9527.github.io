@@ -145,3 +145,9 @@ class Axios {
 
 整体来说关键在于工厂函数里将 axios 所有方法调用者指向 Axios实例。整个设计看起来像是隐藏 Axios 实例，从而保证了 Axios 实例 更加安全。  
 比如开发者如果去观察 axios，除了 ‘原型方法’ 可以没有任何 ‘实例属性’(这里暴露了 interceptors)，如果开发者贸然手动更改 ‘实例属性’ 可能使得代码不能运行
+
+### 一些思考
+
+正如上面所说，我们只暴露应该可以被开发者访问的属性或者方法，其实就是代理模式。举个例子，比如我们想实现 Promise 垫片。我们知道 Promise 实例并没有 state task value 这些，而是一个单纯的对象，有个 then 方法还是原型上的，所以我们可以通过代理把内部维护的 PromiseStatus PromiseValue ‘隐藏’  
+
+另外 函数对象其实还挺有意思的，函数还可以像对象一样。细思极恐的事来了，我们知道 Function.prototype (嗯，按道理它是一个对象，对它继承自 Object.prototype)，可它还偏偏还可以被调用 callable
