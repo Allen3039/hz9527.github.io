@@ -50,3 +50,7 @@ export default function search (kw, source) {
 		return []
 	}
 }
+
+export function padNum (num) {
+	return (num > 9 && num) || `0${num}`
+}

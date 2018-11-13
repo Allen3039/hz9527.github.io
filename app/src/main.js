@@ -3,12 +3,13 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+import { padNum } from './utils/search'
 
 Vue.config.productionTip = false
 
 Vue.filter('formatTime', v => {
 	let time = new Date(v)
-	return `${time.getFullYear()}-${time.getMonth() + 1}-${time.getDate()} ${time.getHours()}:${time.getMinutes()}`
+	return `${time.getFullYear()}-${padNum(time.getMonth() + 1)}-${padNum(time.getDate())} ${padNum(time.getHours())} : ${padNum(time.getMinutes())}`
 })
 
 Vue.directive('toggle', {

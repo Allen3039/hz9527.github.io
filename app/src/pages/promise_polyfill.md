@@ -1,16 +1,19 @@
 ## 实现一个promise
-<b class="update-time">{{1529199994117 | formatTime}}</b>
+
+<b class="update-time">{{1542100282249 | formatTime}}</b>
 <b class='type'>js</b>
 <b class='kw'>promise</b> <b class='kw'>promise实现</b>
 
-> `Promise`大概是前端开发者非常常用的函数之一，除了使用它，是否考虑过自己实现一个简单的`Promise`构造函数？
+> `Promise` 大概是前端开发者非常常用的函数之一，除了使用它，是否考虑过自己实现一个简单的 `Promise` 构造函数？
 
 ### promise基础
+
 1. new Promise
 2. Promise.resolve Promise.reject
 3. Promise.all Promise.race Promise.try
 
 ### 思考几个问题
+
 1. Promise函数参数的执行是同步还是异步？
 2. Promise.prototype.then/catch返回？
 3. 如果返回本身就是一个Promise，那么是否会产生两次异步？
@@ -18,6 +21,7 @@
 5. Promise未执行的then／catch行为？
 
 用以下demo来简单解答这几个问题
+
 ```JavaScript
 // Promise函数参数的执行是同步还是异步？
 // 这将决定我们如何设计异步
@@ -36,15 +40,13 @@ new Promise(r => {
   r()
 }).then(r => {
   console.log(1)
-  Promise.resolve(2).then(r => console.log(r))
+  Promise.resolve(2).then(r => console.log(r)) // 如果 2 先 log 证明 then 返回一个异步函数
   return 3
 }).then(r => {
-  Promise.resolve(4).then(r => console.log(r))
+  Promise.resolve(4).then(r => r).then(r => console.log(r)) // 如果 4 先 log 证明 then fn 返回 promise 不会覆盖原 promise
   console.log(r)
-  return new Promise(r => {
-    r()
-  })
-}).then(r => console.log(5))
+  return Promise.resolve(5)
+}).then(r => console.log(r))
 console.log(6)
 // 6 1 2 3 4 5
 /** Promise.prototype.then/catch返回同样是异步函数（新的Promise）*/
@@ -77,9 +79,11 @@ new Promise(r => {
 ```
 
 ### Promise构造函数基础实现
-> 以示区分，使用`MyPromise`，本节仅实现`new MyPromise`,`then`,`catch`
+
+> 以示区分，使用 `MyPromise` ，本节仅实现 `new MyPromise` , `then` , `catch`
 
 **大致代码**
+
 ```JavaScript
 function MyPromise (exector) {
   let resolve // ...
@@ -92,14 +96,16 @@ MyPromise.prototype.then = function (onResolved, onRejected) {
 ```
 
 **基本思路**
+
 1. 在实例调用then时状态不一定确认了，因此可能需要在更改状态时执行
 2. resolve及reject由构造函数实现，函数本身只用于更改状态机和保存数据和执行可能需要执行的监听函数
 3. 状态一旦确认不可变更，因此需要有锁机制，我们定义三种状态，resolved rejected，pending
-4. then、catch返回均是一个新的Promise实例
+4. then、catch返回均是一个新的Promise实例，而其监听函数的返回Promise 不会覆盖这个 Promise
 5. 在执行resolve前的错误都应该被catch，反之则不应被catch
 6. 在then、catch未传递监听函数应该让新的实例获得其状态及数据
 
 **基本代码**
+
 ```JavaScript
 function MyPromise (exector) {
   this.status = 'pending'
@@ -124,39 +130,35 @@ MyPromise.prototype.then = function (onResolved, onRejected) {
 ```
 
 接下来就是then的实现了，注意以下几点：
+
 1. 返回是promise
 2. 值的穿透
 
-
 ```JavaScript
-MyPromise.prototype.then = function (onResolved, onRejected) {
-  // 若未更改状态则交给更改状态时更改，否则直接执行监听函数
-  // 若监听函数不存在，或不为函数，则传递给返回的promise
-  return new Promise((resolve, reject) => {
-    if (this.status === 'pending') {
-      this.onSettled = () => {
-        this._handlerThen(this.status === 'resolved' ? onResolved : onRejected, resolve, reject)
-      }
+MyPromise.resolve = function(result) {
+  return new MyPromise((resolve, reject) => {
+    if (result && result.constructor === MyPromise) {
+      result.then(resolve, reject)
     } else {
-      this._handlerThen(this.status === 'resolved' ? onResolved : onRejected, resolve, reject)
+      resolve(result)
     }
   })
 }
-MyPromise.prototype._handlerThen = function (preOnSettled, curResolve, curReject) {
-  if (typeof preOnSettled === 'function') {
-    let result = preOnSettled(this.data)
-    if (result && result.constructor === MyPromise) {
-      result.then(curResolve, curReject)
-    } else {
-      curResolve(result)
-    }
+MyPromise.prototype.then = function(onResolved, onRejected) {
+  if (this.status === 'pending') {
+    return new MyPromise((resolve, reject) => {
+      // 将 resolve reject onResolved onRejected 保持起来
+    })
+  } else if (this.status === 'resolved') {
+    return MyPromise.resolve(onResolved(this.data))
   } else {
-    this.status === 'resolved' ? curResolve(this.data) : curReject(this.data)
+    return MyPromise.reject(onRejected(this.data))
   }
 }
 ```
 
 promise构造函数基本框架已完成，接下来就是异步、catch错误及catch、finally实现
+
 1. 利用值的穿透、then来实现catch、finally
 2. catch哪里？
 3. 何时异步？

@@ -1,8 +1,6 @@
-
-
 ## 函数'对象'
 
-<b class="update-time">{{1541852743289 | formatTime}}</b><b class='type'>js</b>
+<b class="update-time">{{1542099017101 | formatTime}}</b><b class='type'>js</b>
 <b class='kw'>axios实现</b> <b class='kw'>apply实现</b> <b class='kw'>bind实现</b>
 
 > 从一道面试题说起
@@ -24,6 +22,7 @@ instance(config)
 是时候复习一下原型相关的知识了  
 
 <details open="true">
+
 <summary><b>一张图了解 prototype constructor __proto__ </b></summary>
 
 ![](../assets/imgs/prototype.jpg)
@@ -44,12 +43,12 @@ instance(config)
 
 好的，我们先回到第一个题目，实现 `add(1)(2)(3).getValue()`。
 
-#### 分析
+#### add方法分析
 
 乍一看像极了柯里化，可是是柯里化吗？不是啊，因为不确定嵌套几层，但是方向是对的，返回了一个函数  
 但是还可以调用 getValue 而且存了一个值。这个简单，函数不也是对象吗？那我就给你加上这些属性呗，然后把你给返回出去
 
-#### 实现
+#### add方法实现
 
 ```js
 'use strict';
@@ -73,13 +72,14 @@ add(1)(2)(3).getValue();
 #### 分析
 
 现在思路应该清晰一点了吧？
+
 1. axios 是一个函数，假设有一个 Axios 类，这个函数就是 Axios 类的 request 方法
-2. axios “继承自” Axios，axios 返回的 子 axios “继承自” axios
+2. axios 拥有 Axios 实例的所有方法，axios.create 返回的 子 axios “继承自” axios 的 Axios 实例
 3. 类似原型链 axios 在获取 config 时会沿着 “原型链” 向上查找
 
 当然实际操作并不是这样的
 
-1. 有一个 Axios 类，并存在继承的方法
+1. 有一个 Axios 类，并暴露一定方法，可以让 axios 获得
 2. 创建 axios 时，先传入 parent ，实例化一个 Axios 对象，setchild，将其所有 key 绑定到 axios 上并将 this 指向 Axios 实例
 3. 关于设置 defaults 有两种方案 1）代理其 get 与 set，在 get 时延 parent 递归合并配置； 2）更改 defaults 时告知每一个 child，child 来生成新的 config
 
@@ -91,12 +91,57 @@ add(1)(2)(3).getValue();
 
 ```js
 // extends 实现
+function AxiosFactory(config, target) {
+  const axios = target ? target.create(config) : new Axios(config, parent)
+  const result = axios.request
+  for (let key in axios) {
+    if (typeof axios[key] === 'function') {
+      result[key] = axios[key].bind(axios)
+    }
+  }
+  result.create = function(conf) {
+    return AxiosFactory(conf, axios)
+  }
+  return result
+}
+
+const axios = AxiosFactory({})
+
+export default axios
 
 ```
 
 ```js
 // Axios.js
-// 不要使用 class。 否则各种属性需要更改描述（enumerable）
+function decorator(conf = {enumerable: true}) {
+  return function(target, name, descriptor) {
+    return Object.assign({}, descriptor, conf)
+  }
+}
 
+class Axios {
+  parent = null
+  children = []
+  config = {}
+  constructor(conf) {
+    this.config = conf;
+    this.interceptors = {
+      request: xx,
+      response: xx
+    }
+  }
+  @decorator()
+  create(conf) {
+    const axios = new Axios(conf);
+    axios.parent = this;
+    this.children.push(axios);
+    return axios;
+  }
+  @decorator()
+  request() {}
+}
 
 ```
+
+整体来说关键在于工厂函数里将 axios 所有方法调用者指向 Axios实例。整个设计看起来像是隐藏 Axios 实例，从而保证了 Axios 实例 更加安全。  
+比如开发者如果去观察 axios，除了 ‘原型方法’ 可以没有任何 ‘实例属性’(这里暴露了 interceptors)，如果开发者贸然手动更改 ‘实例属性’ 可能使得代码不能运行

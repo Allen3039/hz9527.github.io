@@ -30,6 +30,9 @@ class Interceptor {
 
 // 对外只有 request put get post setDefaults 可枚举
 class Axios {
+  config = {}
+  parent = null
+  children = []
   constructor(config, parent) {
     this.config = setDefault(config);
     this.parent = parent;
@@ -40,7 +43,7 @@ class Axios {
     }
   }
   create(config) {
-    const child = Axios(config, this);
+    const child = new Axios(config, this);
     this.children.push(child);
     return child;
   }

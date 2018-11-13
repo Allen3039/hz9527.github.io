@@ -21,14 +21,15 @@ function injectBefore (content, str, reg) {
 }
 
 function getTitle (str) {
-	return str.match(/#+?\s+?.+?\n/g)
+	// 注意代码块里可能有 #
+	return str.replace(/```sh([^(```)])+```/g, '').match(/\n#+?\s+?.+?\n/g)
 }
 
 function genMenu (list) {
 	if (!list) return ''
 	let con = list.map(item => {
 		let level = item.match(/#+/)[0].length
-		let tit = item.replace(/(#+?\s+?)(.+?)(\n)/, '$2')
+		let tit = item.replace(/(\n#+?\s+?)(.+?)(\n)/, '$2')
 		return `<a href="#${tit}" class="level-${level} aside-menu-item">${tit}</a>`
 	}).join('')
 	return `<div class="aside-menu">
