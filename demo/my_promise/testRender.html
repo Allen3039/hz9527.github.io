@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+    <div class="test">123</div>
+    <script>
+      let test = document.querySelector('.test')
+      setTimeout(() => {
+        test.style.color = '#f55'
+        test.innerHTML = '333'
+        Promise.resolve('微队列')
+          .then(alert)
+        setTimeout(() => {
+          test.style.color = '#3ee'
+          test.innerHTML = '555'
+          setTimeout(() => {
+            alert('宏队列')
+          }, 0)
+        }, 0)
+      }, 1000)
+    </script>
+</body>
+</html>

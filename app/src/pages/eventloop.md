@@ -169,3 +169,5 @@ new Promise((resolve, reject) => {
 ```
 
 显然是先 catch2
+
+### 关于
