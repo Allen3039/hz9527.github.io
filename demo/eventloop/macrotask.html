@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>test macrotask</title>
+  <style media="screen">
+    .test {
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+    <div class="test">123</div>456
+    <script>
+      // demo1 我们在浏览器 performance event log 中可以看到两次 Timer Fired 中间有一次渲染
+      let test = document.querySelector('.test')
+      // setTimeout(() => {
+      //   setTimeout(() => {
+      //     // alert(123)
+      //     test.style.width = '300px'
+      //     // test.style.color = '#f55'
+      //     Promise.resolve(performance.now())
+      //       .then(console.log)
+      //   }, 2)
+      //   setTimeout(() => {
+      //     // alert(123)
+      //     test.style.width = '200px'
+      //     // test.style.color = '#f55'
+      //     console.log(performance.now(), 'timer2')
+      //   }, 0)
+      // }, 300)
+
+      // setTimeout(() => {
+      //   test.style.width = '300px'
+      //   Promise.resolve(performance.now())
+      //     .then(console.log)
+      // }, 0)
+      // setTimeout(() => {
+      //   test.style.width = '200px'
+      //   console.log(performance.now(), 'timer2')
+      // }, 0)
+      let color = 0;
+      function random(v) {
+        return parseInt(Math.random() * v) + 1
+      }
+
+      function changeColor() {
+        test.style.color = `rgb(255, ${random(color)}, ${random(color)})`
+      }
+      function changeWidth() {
+        test.style.width = random(color) * 2 + 'px'
+      }
+      function run() {
+        setTimeout(() => {
+          if (color < 255) {
+            run()
+          }
+          if (++color % 2 === 0) {
+            changeColor()
+          } else {
+            changeWidth()
+          }
+        }, 0)
+      }
+      run()
+    </script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 ## 事件循环的一点疑惑
 
-<b class="update-time">{{1542038708508 | formatTime}}</b><b class="type">其他</b>
+<b class="update-time">{{1542209870452 | formatTime}}</b><b class="type">其他</b>
 <b class='kw'>promise</b> <b class='kw'>事件循环</b> <b class='kw'>宏队列与微队列</b>
 
 > 我们知道 js 是单线程执行的，但是借助宿主，可以获得异步的能力，在浏览器中依赖 webAPI，在 node 中依赖 libuv
@@ -10,50 +10,56 @@
 
 先看题
 
-```js
-new Promise(resolve => {
-  console.log('promise1')
-  resolve(1)
-}).then(res => {
-  console.log('promise1', ++res)
-  performance.now()
-  return res
-}).then(res => {
-  console.log('promise1', ++res)
-  return Promise.resolve(res) // 注意这里不一样
-}).then(res => {
-  console.log('promise1', ++res)
-  return res
-}).then(res => {
-  console.log('promise1', ++res)
-  return res
-}).then(res => {
-  console.log('promise1', ++res)
-  return res
-})
+<details>
+  <summary>js</summary>
 
-console.log('normal')
+  ```js
+  new Promise(resolve => {
+    console.log('promise1')
+    resolve(1)
+  }).then(res => {
+    console.log('promise1', ++res)
+    performance.now()
+    return res
+  }).then(res => {
+    console.log('promise1', ++res)
+    return Promise.resolve(res) // 注意这里不一样
+  }).then(res => {
+    console.log('promise1', ++res)
+    return res
+  }).then(res => {
+    console.log('promise1', ++res)
+    return res
+  }).then(res => {
+    console.log('promise1', ++res)
+    return res
+  })
 
-new Promise(resolve => {
-  console.log('promise2')
-  resolve(1)
-}).then(res => {
-  console.log('promise2', ++res)
-  return res
-}).then(res => {
-  console.log('promise2', ++res)
-  return res
-}).then(res => {
-  console.log('promise2', ++res)
-  return res
-}).then(res => {
-  console.log('promise2', ++res)
-  return res
-}).then(res => {
-  console.log('promise2', ++res)
-  return res
-})
-```
+  console.log('normal')
+
+  new Promise(resolve => {
+    console.log('promise2')
+    resolve(1)
+  }).then(res => {
+    console.log('promise2', ++res)
+    return res
+  }).then(res => {
+    console.log('promise2', ++res)
+    return res
+  }).then(res => {
+    console.log('promise2', ++res)
+    return res
+  }).then(res => {
+    console.log('promise2', ++res)
+    return res
+  }).then(res => {
+    console.log('promise2', ++res)
+    return res
+  })
+  ```
+
+</details>
+
 
 咋一看，你的答案可能是这样：
 
@@ -120,36 +126,41 @@ new Promise(resolve => {
 > 看到这里我好像明白了，看来 promise 垫片需要重写了，因为返回 Promise 并不是让其代替默认返回的 Promise 而是照常返回，只是 value 是 Promise 实例
 显然事件循环是在 resolve reject 内部实现
 
-```js
-Promise.resolve = function(result) {
-  return new Promise(resolve => {
-    if (result && result.constructor === Promise) {
-      result.then(resolve)
-    } else {
-      resolve(result)
-    }
-  })
-}
+<details>
+  <summary>js</summary>
 
-Promise.prototype.then = function(fn, fn2) {
-  // 省略状态判断
-  return Promise.resolve(fn(this.data))
-}
+  ```js
+  Promise.resolve = function(result) {
+    return new Promise(resolve => {
+      if (result && result.constructor === Promise) {
+        result.then(resolve)
+      } else {
+        resolve(result)
+      }
+    })
+  }
 
-// 可能还是懵的，那我们再来看 返回 Promise.resolve(res)即 result就是 Promise.resolve(res)
-Promise.resolve = function(result) {
-  return new Promise(resolve => {
-    if (result && result.constructor === Promise) {
-      // Promise.resolve(res).then(resolve)
-      let pro = Promise.resolve(res) // Promise.resolve 内部调用一次 resolve
-      pro.then(fn) // then 内部调用 Promise.resolve, Promise.resolve 调用 resolve 两次了
-      // 这里 fn 就是 resolve 一共三次，所以间隔了三次事件循环
-    } else {
-      resolve(result)
-    }
-  })
-}
-```
+  Promise.prototype.then = function(fn, fn2) {
+    // 省略状态判断
+    return Promise.resolve(fn(this.data))
+  }
+
+  // 可能还是懵的，那我们再来看 返回 Promise.resolve(res)即 result就是 Promise.resolve(res)
+  Promise.resolve = function(result) {
+    return new Promise(resolve => {
+      if (result && result.constructor === Promise) {
+        // Promise.resolve(res).then(resolve)
+        let pro = Promise.resolve(res) // Promise.resolve 内部调用一次 resolve
+        pro.then(fn) // then 内部调用 Promise.resolve, Promise.resolve 调用 resolve 两次了
+        // 这里 fn 就是 resolve 一共三次，所以间隔了三次事件循环
+      } else {
+        resolve(result)
+      }
+    })
+  }
+  ```
+
+</details>
 
 现在终于能解释为什么 `return Promise.resolve(res)` 间隔了三次事件循环了
 
@@ -170,4 +181,68 @@ new Promise((resolve, reject) => {
 
 显然是先 catch2
 
-### 关于
+### 关于 macrotask & microtask
+
+先祭出一张图吧  
+<img src="../assets/imgs/eventLoop.jpg" width="500px" />
+
+#### 一次事件循环只执行一个 macrotask
+
+看一个例子
+
+```js
+setTimeout(() => {
+  Promise.resolve(2)
+    .then(console.log)
+}, 0)
+
+setTimeout(() => {
+  console.log(1)
+}, 0)
+```
+
+答案是 2 1。或许你这里就算用了 performance 也不能看出端倪，那么我们就用完整的事件循环来看吧
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>test macrotask</title>
+</head>
+<body>
+    <div class="test">123</div>
+    <script>
+      let test = document.querySelector('.test')
+      setTimeout(() => {
+        setTimeout(() => {
+          test.style.width = '300px'
+          Promise.resolve(performance.now())
+            .then(console.log)
+        }, 0)
+        setTimeout(() => {
+          test.style.width = '200px' // 需要重排才行，如果一个引发重绘一个引发重排也不会 render
+          console.log(performance.now(), 'timer2')
+        }, 0)
+      }, 300) // 需要 firstRender 完成
+    </script>
+</body>
+</html>
+```
+
+好吧，我承认为了把它们分到两次事件循环花了很长时间，因为浏览器实在太聪明了！！！  
+首先完整的事件循环并不是 run 一个 macrotask 后立马 render 而是 判断是否需要重现渲染。这个完全就是看浏览器心情了。。。。  
+根据上面的例子我们得到的结论就是 **每次事件循环只执行一个 macrotask** ，但是问题来了
+
+1. 如果把前一个 time 改为 1 会先执行哪个？
+2. 我们在写动画时用 setTimeout 0 会发生什么？
+
+第一个问题的答案是不确定，完全看心情，笔者使用 chrmoe 基本是间隔 2 毫秒才会先执行第二个，但至少可以确定的是 不一定 根据 time（间隔比较小） 参数来决定 installTimer 顺序  
+第二个问题 浏览器真的很聪明，我使用的 chrome 开始一般 合并 3-4 帧，然后 合并 10 多帧，最后基本是 7-8 帧，才渲染一次（不管是是否引发重排）
+
+#### 一次事件循环会执行完所有微队列
+
+这一部分感觉没什么好说的，但是可以说的是必须清空微队列才会进入新的事件循环，也就是意味着在一个微队列里执行新的微队列会在一次事件循环里
+
+### 预告
+
+事件循环将是一个系列，下一个系列会具体谈一下事件循环如何执行以及和浏览器相关的

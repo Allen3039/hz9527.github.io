@@ -1,6 +1,6 @@
 <html>
 <body>
-  <!-- <link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/4.0.0-alpha.4/css/bootstrap.css"> -->
+
     <h2>Hello</h2>
     <script>
       // alert(1)
@@ -13,21 +13,23 @@
         var i = 0;
         // while (i++ < 10000000) {}
         console.log(v)
+        return v
       }
       function runProm() {
         Promise.resolve(3)
+          .then(console2)
           .then(console2)
       }
       runProm();
       printH2()
       console2(1)
-      setTimeout(printH2)
+      setTimeout(printH2, 0)
     </script>
     <script>
       console2('second script');
     </script>
 
-    <!-- <link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/4.0.0-alpha.4/css/bootstrap.css"> -->
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/4.0.0-alpha.4/css/bootstrap.css">
     <h2>World</h2>
     <script>
       console2('last script');
