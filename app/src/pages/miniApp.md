@@ -7,7 +7,7 @@
 我们可以想像在一个 app 内如何实现小程序。
 
 * app 提供一个 `纯 js 执行环境`，并注入 JSSDK 即 `纯 js 执行环境` 与 native 通信。
-* 创建 `native` 页面，内部有一个 `webview` 组件，让 `纯 js 执行环境` 可以和 `webview` 相互通信。(todo)
+* 创建 active，内部有一个 `webview` 组件，让 `纯 js 执行环境` 可以和 `webview` 相互通信。(todo)
 * `webview` 可以和 `native` 通信。比如 `webview` 需要渲染一个 native 组件（取决于 wxml 结构)，`webview` 通知 native 去渲染一个 `native 组件` 覆盖在 `webview` 上，并注册对 `native 组件` 事件的监听 （取决于 wxml 是否监听了）。
 
 总体来看，就是 `纯 js 执行环境` 只负责数据和逻辑，`webview` 只负责 UI （包括UI事件的通知和渲染）。`纯 js 执行环境` 和 native 及 `webview` 可以通信；`webview` 可以和 native 通信。两者与 native 通信的职责不同，前者是获取 native 的 api 能力，后者是 UI 能力。
@@ -15,6 +15,8 @@
 > 这里及以下 `native 组件` 代指 非 webview 组件
 
 todo 确定 `webview` 执行监听回掉是同步执行还是异步执行
+
+[小程序开发指南](https://developers.weixin.qq.com/ebook?action=get_post_info&token=935589521&volumn=1&lang=zh_CN&book=miniprogram&docid=0008aeea9a8978ab0086a685851c0a)
 
 **解析：**  
 
@@ -37,7 +39,7 @@ setData 内部会同步更新 data，并将 参数 传递给 webview，由于涉
 
 1. 父组件（页面）setData ，子组件此时单纯修改数据是否会渲染
 2. 父组件（页面）与子组件同时调用 setData 会重复渲染吗？
-2. 父组件（页面）setData，子组件 使用了上级 data 作为其 props，并代理了这个 props（代理内 setData）会在上级 setData 完成前还是完成后调用
+3. 父组件（页面）setData，子组件 使用了上级 data 作为其 props，并代理了这个 props（代理内 setData）会在上级 setData 完成前还是完成后调用
 
 完成前调用那么（其实好像没有必要）
 
@@ -213,3 +215,14 @@ t.getObjectByPath = function(pageData, key) {
   }
 }
 ```
+
+todo
+
+1. 组件和父页面同步 setData 渲染次数？ 查看回调是否在一次事件循环（一方面两次同步 invoke 导致回调异步）所以除了微队列判断外还需要 performance
+2. trigger 是同步还是异步？虽然很好实现同步，但是文档说模拟组件事件，而且还可以冒泡
+3. 子组件感知 props 变化是同步还是异步？
+
+* 组件和父页面同步 setData 渲染次数是 1次，基本可以放心同步 setData，毕竟两个不同实例，无法一次 setData
+* 如果 trigger 是异步有必要实现成同步吗？
+* 如果 感知 props 变化是异步，有必要实现成同步吗？
+* 如何拿到 Page/App/Component.prototype
