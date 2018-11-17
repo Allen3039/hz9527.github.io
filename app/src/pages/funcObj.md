@@ -148,6 +148,31 @@ class Axios {
 
 ### 一些思考
 
-正如上面所说，我们只暴露应该可以被开发者访问的属性或者方法，其实就是代理模式。举个例子，比如我们想实现 Promise 垫片。我们知道 Promise 实例并没有 state task value 这些，而是一个单纯的对象，有个 then 方法还是原型上的，所以我们可以通过代理把内部维护的 PromiseStatus PromiseValue ‘隐藏’  
+正如上面所说，我们只暴露应该可以被开发者访问的属性或者方法，其实就是代理模式。举个例子，比如我们想实现 Promise 垫片。我们知道 Promise 实例并没有 state task value 这些，而是一个单纯的对象，有个 then 方法还是原型上的，所以我们可以通过代理把内部维护的 PromiseStatus PromiseValue ‘隐藏’ ，当然这还是不优雅，有没有更好的方案？  
+假设我们封装了一个构造器函数，我们希望实例有一些内部维护的数据，但是不希望开发者去访问和使用，如果是模块化比较好办，但很多模块化方案就是闭包啊
 
-另外 函数对象其实还挺有意思的，函数还可以像对象一样。细思极恐的事来了，我们知道 Function.prototype (嗯，按道理它是一个对象，对它继承自 Object.prototype)，可它还偏偏还可以被调用 callable
+```js
+(function () {
+  const CacheData = {} // 存放实例 id 和 data
+  let lastId = 0
+  function A() {
+    this.id = lastId++;
+    CacheData[this.id] = {}
+  }
+
+  function.prototype.b = function(v) {
+    CacheData[this.id].c = v
+  }
+  window.A = A
+})()
+```
+
+这样只暴露了 id 给开发者，而开发者却访问不到 id 对应的 ‘内部数据’  
+假设我们需要实现一个类，这个类内部做了一些数据缓存
+
+1. 一种方式是通过一个工厂函数返回一个类实例的代理对象，但这种方式首先是 new 显得无意义，另一方面是每次创建代理还需要进行一次拷贝（虽然拷贝的是引用）
+2. 只是暴露一个 id，但是 使用者无法访问 id 对应的数据，当然这种方式也有坏处，当实例被销毁时对应的数据无法感知，可能导致内存泄漏，或者说不必要的内存使用
+
+方案1 比较适合暴露的类由开发者自己使用，可以随意销毁。方案2 比较适合新的类来控制，比如提供生命周期，通过 destroy 来销毁（比如实现一个 MVVM 框架）
+
+另外 函数对象其实还挺有意思的，函数还可以像对象一样。细思极恐的事来了，我们知道 Function.prototype (嗯，按道理它是一个对象，对，它继承自 Object.prototype)，可它还偏偏还可以被调用 callable
