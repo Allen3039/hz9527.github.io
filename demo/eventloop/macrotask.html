@@ -3,66 +3,222 @@
 <head>
   <title>test macrotask</title>
   <style media="screen">
-    .test {
+    .container {
+      display: flex;
+      justify-content: space-around;
+    }
+    .item {
+      width: 30%;
+      flex-grow: 0;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .btn, .reset {
+      display: inline-block;
+      padding: 10px 20px;
+      background: #f55;
+      color: #fff;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    .reset {margin: 20px;}
+    summary {cursor: pointer;}
+    summary:focus {outline: none;}
+    .demo {
       display: inline-block;
     }
   </style>
 </head>
 <body>
-    <tt-view>test</tt-view>
-    <div class="test">123</div>456
-    <script>
-      // demo1 我们在浏览器 performance event log 中可以看到两次 Timer Fired 中间有一次渲染
-      let test = document.querySelector('.test')
-      // setTimeout(() => {
-      //   setTimeout(() => {
-      //     // alert(123)
-      //     test.style.width = '300px'
-      //     // test.style.color = '#f55'
-      //     Promise.resolve(performance.now())
-      //       .then(console.log)
-      //   }, 2)
-      //   setTimeout(() => {
-      //     // alert(123)
-      //     test.style.width = '200px'
-      //     // test.style.color = '#f55'
-      //     console.log(performance.now(), 'timer2')
-      //   }, 0)
-      // }, 300)
+  <div class="reset">reset</div>
+  <div class="container">
+    <div class="item">
+      <div class="btn" data-ind="0">run demo1</div>
+      <details open class="detail">
+        <summary> 证明宏队列在一次事件循环只执行一次 </summary>
+        背景：我们知道 事件循环机制里是执行一次事件循环会执行一个宏任务，执行完所有微队列，再进行下一轮事件循环 <br>
+        思路：两次 setTimeout，前一个执行一个 微任务，如果 微任务先执行，证明 后一个 setTimeout 是在下一轮事件循环执行的 <br>
+        ps：前几天写的一个 demo 是 两次会操作 dom（触发回流），然后两个 setTimeout 中间会有一次渲染，最近升级了 Chrome 然后就不行了
+      </details>
+    </div>
+    <div class="item">
+      <div class="btn" data-ind="1">run demo2</div>
+      <details class="detail">
+        <summary> 执行完一次宏任务不一定要渲染 </summary>
+        背景：我们知道 执行完一次事件循环需要判断是否需要渲染 <br>
+        思路：递归 setTimeout (不同的事件循环里执行 setTimeout 结果是不同的)<br>
+      </details>
+    </div>
+    <div class="item">
+      <div class="btn" data-ind="2">run demo3</div>
+      <details class="detail">
+        <summary> 执行完一次宏任务不一定要渲染 </summary>
+        背景：看了前面的 demo 后，你可能觉得是因为使用的 setTimeout 0 ，所以导致执行多个setTimeout 才渲染一次 <br>
+      </details>
+    </div>
+  </div>
 
-      // setTimeout(() => {
-      //   test.style.width = '300px'
-      //   Promise.resolve(performance.now())
-      //     .then(console.log)
-      // }, 0)
-      // setTimeout(() => {
-      //   test.style.width = '200px'
-      //   console.log(performance.now(), 'timer2')
-      // }, 0)
-      let color = 0;
-      function random(v) {
-        return parseInt(Math.random() * v) + 1
+  <div class="demo">demo</div>456
+  <script type="text/javascript">
+    function Dom(el) {
+      this.el = el
+    }
+    Dom.prototype.bind = function(eventName, fn, opt = false) {
+      this.el && this.el.addEventListener(eventName, fn, opt)
+      return this
+    }
+    Dom.prototype.getEl = function() {
+      return this.el
+    }
+    function Doms(els) {
+      this.doms = Array.prototype.slice.call(els).map(el => new Dom(el))
+      this.length = this.doms.length
+    }
+    Doms.prototype.bind = function(eventName, fn, opt = false) {
+      this.doms.forEach(dom => dom.bind(eventName, fn, opt))
+      return this
+    }
+    Doms.prototype.forEach = function(fn) {
+      this.doms.forEach(fn)
+      return this
+    }
+    Doms.prototype.getDom = function(ind) {
+      return this.doms[ind]
+    }
+    const $ = (selector) => {
+      let el = document.querySelectorAll(selector)
+      return el.length > 1 ? new Doms(el) : new Dom(el[0] || null)
+    }
+    const Schedule = {
+      fns: {},
+      use(fn, demoInd, context) {
+        let doms = $('.detail')
+        if (doms.length <= demoInd) return
+        let pre = document.createElement('pre')
+        pre.innerHTML = `<code>${fn.toString().replace(/\n(\s+)/g, (sub, s) => `\n${s.slice(0, -4)}`)}</code>`
+        doms.getDom(demoInd).el.appendChild(pre)
+        this.fns[demoInd] = fn.bind(context)
+      },
+      run(demoInd) {
+        typeof this.fns[demoInd] === 'function' && this.fns[demoInd]()
       }
+    }
 
-      function changeColor() {
-        test.style.color = `rgb(255, ${random(color)}, ${random(color)})`
+    $('.btn').bind('click', event => {
+      const {ind} = event.target.dataset
+      if (!ind) return
+      Schedule.run(ind)
+    })
+    $('.detail').bind('click', event => {
+      !event.target.parentNode.open && $('.detail').forEach(dom => {
+        if (dom.el !== event.target.parentNode && dom.el.open) dom.el.open = false
+      })
+    })
+    const Demo = $('.demo').getEl()
+    $('.reset').bind('click', () => {
+      window.location.reload()
+    })
+  </script>
+  <script type="text/javascript">
+    function Demo1() {
+      setTimeout(() => {
+        Promise.resolve(performance.now())
+          .then(console.log)
+        console.log(performance.now(), 'timer1')
+      }, 0)
+      setTimeout(() => {
+        console.log(performance.now(), 'timer2')
+      }, 0)
+    }
+    Schedule.use(Demo1, '0')
+  </script>
+  <script type="text/javascript">
+    let width = 100;
+    function Demo2() {
+      if (width < 500) {
+        width += 10
+        Demo2()
       }
-      function changeWidth() {
-        test.style.width = random(color) * 2 + 'px'
-      }
-      function run() {
+      setTimeout(() => {
+        Demo.style.width = width + 'px'
+        // if (width < 500) {
+        //   width += 10
+        //   Demo2()
+        // }
+      }, 0)
+      // if (width < 500) {
+      //   width += 10
+      //   Demo2()
+      // }
+    }
+    Schedule.use(Demo2, '1')
+  </script>
+  <script type="text/javascript">
+    function Demo3() {
+      setTimeout(() => {
+        Demo.style.width = '100px'
+      }, 0)
+      setTimeout(() => {
+        Demo.style.background = '#f55'
         setTimeout(() => {
-          if (color < 255) {
-            run()
-          }
-          if (++color % 2 === 0) {
-            changeColor()
-          } else {
-            changeWidth()
-          }
+          Demo.style.width = '500px'
         }, 0)
-      }
-      run()
-    </script>
+      }, 0)
+    }
+    Schedule.use(Demo3, '2')
+  </script>
+  <script>
+    // // demo1 我们在浏览器 performance event log 中可以看到两次 Timer Fired 中间有一次渲染
+    // let test = document.querySelector('.test')
+    // // setTimeout(() => {
+    // //   setTimeout(() => {
+    // //     // alert(123)
+    // //     test.style.width = '300px'
+    // //     // test.style.color = '#f55'
+    // //     Promise.resolve(performance.now())
+    // //       .then(console.log)
+    // //   }, 2)
+    // //   setTimeout(() => {
+    // //     // alert(123)
+    // //     test.style.width = '200px'
+    // //     // test.style.color = '#f55'
+    // //     console.log(performance.now(), 'timer2')
+    // //   }, 0)
+    // // }, 300)
+    //
+    // // setTimeout(() => {
+    // //   test.style.width = '300px'
+    // //   Promise.resolve(performance.now())
+    // //     .then(console.log)
+    // // }, 0)
+    // // setTimeout(() => {
+    // //   test.style.width = '200px'
+    // //   console.log(performance.now(), 'timer2')
+    // // }, 0)
+    // let color = 0;
+    // function random(v) {
+    //   return parseInt(Math.random() * v) + 1
+    // }
+    //
+    // function changeColor() {
+    //   test.style.color = `rgb(255, ${random(color)}, ${random(color)})`
+    // }
+    // function changeWidth() {
+    //   test.style.width = random(color) * 2 + 'px'
+    // }
+    // function run() {
+    //   setTimeout(() => {
+    //     if (color < 255) {
+    //       run()
+    //     }
+    //     if (++color % 2 === 0) {
+    //       changeColor()
+    //     } else {
+    //       changeWidth()
+    //     }
+    //   }, 0)
+    // }
+    // run()
+  </script>
 </body>
 </html>
