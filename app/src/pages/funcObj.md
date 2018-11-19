@@ -176,3 +176,5 @@ class Axios {
 方案1 比较适合暴露的类由开发者自己使用，可以随意销毁。方案2 比较适合新的类来控制，比如提供生命周期，通过 destroy 来销毁（比如实现一个 MVVM 框架）
 
 另外 函数对象其实还挺有意思的，函数还可以像对象一样。细思极恐的事来了，我们知道 Function.prototype (嗯，按道理它是一个对象，对，它继承自 Object.prototype)，可它还偏偏还可以被调用 callable
+
+<b class="show-blog">true</b>
