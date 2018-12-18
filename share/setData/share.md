@@ -6,6 +6,7 @@ theme: moon
 usemathjax: yes
 
 [slide]
+
 # 浅尝小程序 setData
 
 ## this.setData 小程序最重要最核心的 API，没有之一
@@ -13,21 +14,24 @@ usemathjax: yes
 [slide]
 
 ## 背景知识 -- 事件循环
+
 ----
 之所以称为事件循环，是因为它经常被用于类似如下的方式来实现：
 
 {:&.rollIn}
+
 ```js
 while (queue.waitForMessage()) {
   queue.processNextMessage();
 }
 ```
-{:&.rollIn}
+
+<br/>
 > Job 是 ES6 中新增的概念，它与 Promise 的执行有关，可以理解为等待执行的任务；Job Queue 就是这种类型的任务的队列。JavaScript Runtime 对于 Job Queue 与 Event Loop Queue 的处理有所不同。
 每个 JavaScript Runtime 可以有多个 Job Queue，但只有一个 Event Loop Queue
 当 JavaScript Engine 处理完当前 chunk 后，优先执行所有的 Job Queue，然后再处理 Event Loop Queue
 
-总之需要记住的是同一个 chunk 微队列先执行
+<br/><p style="text-align: left">总之需要记住的是同一个 chunk 微队列先执行</p>
 
 [slide]
 
@@ -38,8 +42,10 @@ while (queue.waitForMessage()) {
 [slide]
 
 ## 讲这些干嘛？
+
 ----
 {:&.fadeIn}
+
 ```js
 // 去掉不影响主流程代码
 setData (newData, completeCb = noop) {
@@ -60,6 +66,7 @@ setData (newData, completeCb = noop) {
 <img src="/assets/eventLoop3.png" width="80%">
 
 [slide]
+
 ----
 <iframe data-src="/assets/demo.html" style="height: 600px"></iframe>
 
@@ -70,6 +77,7 @@ setData (newData, completeCb = noop) {
 [slide]
 
 ## 回到 setData
+
 ----
 
 <pre>
@@ -120,7 +128,9 @@ setData (newData, completeCb = noop) {
 </pre>
 
 [slide]
+
 ----
+
 ## setData 干了啥？
 
 转了一大圈原来 setData 就干了两件事
@@ -129,7 +139,9 @@ setData (newData, completeCb = noop) {
 2. 把增量对象通过 native 偷偷告诉 webview
 
 [slide]
+
 ## 我们可以怎么搞事情呢？ 😂
+
 ----
 {:&.fadeIn}
 <p style="text-align: left">思考几个问题：</p>
@@ -147,6 +159,7 @@ Page({
 [slide]
 
 ## 好像明白了一点
+
 ----
 {:&.fadeIn}
 
@@ -156,7 +169,7 @@ Options！
 
 > 注意 小程序 初始化基本是毫无人性地将 data 作了 JSON.parse(JSON.stringify(opt.data))，所有你传进来的 对象 深拷贝了一份
 
-所以当然是选择原谅他啦！
+<br/><p style="text-align: left">所以当然是选择原谅他啦！</p>
 
 [slide]
 
@@ -189,10 +202,16 @@ Page = function(opt) {
 }
 ```
 
+[slide]
+
+## 事情当然不会那么简单
+
 > 我们通过重写 Page 方法，在 内部重写 Options 钩子函数，在钩子函数里拿到 this，并将 this.data 变成 Observer，然后彻底忘掉 setData
 
-[slide]
-## 事情当然不会那么简单
+<br/><br/>
+
+----
+{:&.fadeIn}
 
 ```js
 // data {a: 1, b: 2}
@@ -204,10 +223,14 @@ this.data.a = 3
 > 这里之所以 不会变乱 是因为 3 是一个 基本数据类型，而 get this.data.a 就是这个，所以不会 触发 set，而当 a 的值是一个引用呢？
 
 [slide]
+
 ## 让我再想想
------
+
+----
+
 1. 我们想解决什么问题？ 频繁 setData 带来的性能问题，我们希望截流，让开发者不用思考 setData 是否会带来性能问题 {:&.fadeIn}
 2. 为什么代理 set 行为？ 一方面通过这种方式帮助开发者在合适的时机 setData，另一方面不需要显式调用 setData
+
 <br/><br/>
 
 {:&.fadeIn}
@@ -220,11 +243,14 @@ this.data.a = 3
 2. 我们在 set 行为加一个 锁机制
 
 [slide]
+
 ## 锁机制很好理解，但是到底该如何使用？
+
 ----
 
 1. 忽略 开发者的 set 行为。即开发者 set 只触发 notify，异步队列开始时 开锁，在 setData set 完成 锁上。
 2. 忽略 setData set 行为。即开发者 set 触发 notify & set，异步队列开始时 锁上，在 setData 完成 开锁。
+
 <br/><br/>
 
 {:&.fadeIn}
@@ -259,9 +285,12 @@ setTimeout(() => {
 
 ```
 
+----
+{:&.fadeIn}
+
 > 总体来看 锁住 setData set 行为好像更为合理，但是确实底层做的很多事感觉就白费了
 
-[slide]
+[slide data-transition="vertical3d"]
 
 我们再来看这段代码
 
@@ -275,12 +304,23 @@ setData (newData, completeCb = noop) {
 }
 ```
 
+----
+{:&.fadeIn}
+
 是不是有思路了？ 你不是 for 吗？我让你 for 不到不就行了，不过回头你会做 JSON.stringify （会忽略不可遍历的属性和值为 undefined 的属性）
 
 [slide]
-## 这就想难道我大 JS 黑科技吗？
+
+## 这就想难倒我大 JS 黑科技吗？
+
 ----
-我们代理一个特别简单的属性，然后在其get上添加各种 key，这样就可以保证后续拿到的就是一个我们想要的 data，但是会给这个 data 添加一个不必要的属性，总之就是欺骗 for 循环
+{:&.fadeIn}
+
+我们代理一个特别简单的属性，然后在其 调用 getter 时添加各种 key，这样就可以保证后续拿到的就是一个我们想要的 data，但是会给这个 data 添加一个不必要的属性，不过能达到欺骗 for 的目的
+<br/><br/><br/><br/>
+
+[slide data-transition="vertical3d"]
+
 ```js
 const newData = {
   a: {b: 1},
