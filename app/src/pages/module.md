@@ -1,6 +1,6 @@
 # 前端模块化
 
-<b class='type'>js</b>
+<b class="update-time">{{1547472906277 | formatTime}}</b><b class='type'>js</b>
 <b class='kw'>前端模块化</b> <b class='kw'>es6 module</b> <b class='kw'>commonJs</b> <b class='kw'>AMD</b><b class='kw'>UMD</b><b class='kw'>CMD</b>
 
 > 模块化是工程化的基础，前端模块化的价值体现在 1. 合成复用； 2. 单一职责。对项目可维护性和可读性也大大增强
