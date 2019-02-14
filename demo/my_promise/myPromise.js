@@ -1,54 +1,108 @@
-function MyPromise(exector) {
-  this._state = 'pending'
-  this._tasks = []
-  exector(this._changeStateFactory('fulfilled'), this._changeStateFactory('rejected'))
-}
-MyPromise.prototype._changeStateFactory = function(state) {
-  return (data) => {
-    if (this._state === 'pending') {
-      this._state = state
-      this._data = data
-      setTimeout(() => {
-        if (this._tasks.length > 0) {
-          this._state === 'fulfilled' ? this._tasks[0](data) : this._tasks[1](data)
-          this._tasks = null
-        }
-      }, 0)
+function MyPromise(executor) {
+  this.status = 0;
+  this.data = null;
+  this.onResolved = null;
+  this.onRejected = null;
+  const handler = (status) => data => {
+    if (this.status === 0) {
+      this.status = status;
+      this.data = data;
+      const fn = this.status === 1 ? this.onResolved : this.onRejected;
+      typeof fn === 'function' && fn(this.data)
     }
   }
+  executor(handler(1), handler(2))
 }
-MyPromise.resolve = function(result) {
+MyPromise.resolve = function(data) {
   return new MyPromise((resolve, reject) => {
-    if (result && result.constructor === MyPromise) {
-      result.then(resolve, reject)
+    if (data && data.constructor === MyPromise) {
+      data.then(resolve, reject)
     } else {
-      resolve(result)
+      resolve(data)
     }
   })
 }
-
-MyPromise.reject = function(result) {
+MyPromise.reject = function(err) {
   return new MyPromise((resolve, reject) => {
-    if (result && result.constructor === MyPromise) {
-      result.then(resolve, reject)
+    if (err && err.constructor === MyPromise) {
+      err.then(resolve, reject)
     } else {
-      reject(reject)
+      reject(err)
     }
   })
 }
 
 MyPromise.prototype.then = function(onResolved, onRejected) {
-  typeof onResolved !== 'function' && (onResolved = data => data)
-  typeof onRejected !== 'function' && (onRejected = data => data)
-  if (this._state === 'pending') {
-    return new MyPromise((resolve, reject) => {
-      this._tasks = [(data) => resolve(onResolved(data)), (data) => reject(onRejected(data))]
-    })
-  }
-  return this._state === 'fulfilled' ? MyPromise.resolve(onResolved(this._data))
-    : MyPromise.reject(onRejected(this._data))
+  return new MyPromise((resolve, reject) => {
+    const handler = (fn, data, onFinally) => {
+      setTimeout(() => {
+        const result = typeof fn === 'function' ? fn(data) : data;
+        if (result && result.constructor === MyPromise) {
+          result.then(resolve, reject)
+        } else {
+          onFinally(result)
+        }
+      })
+    }
+    if (this.status === 0) {
+      this.onResolved = (data) => {
+        handler(onResolved, data, resolve)
+      };
+      this.onRejected = (data) => {
+        handler(onRejected, data, reject)
+      };
+    } else {
+      this.status === 1 ? handler(onResolved, this.data, resolve) : handler(onRejected, this.data, reject)
+    }
+  })
 }
 
-MyPromise.prototype.catch = function (onRejected) {
+MyPromise.prototype.catch = function(onRejected) {
   return this.then(void 0, onRejected)
 }
+
+MyPromise.prototype.finally = function(onFinally) {
+  return this.then(onFinally, onFinally)
+}
+
+new MyPromise(resolve => {
+  console.log('promise1')
+  resolve(1)
+}).then(res => {
+  console.log('promise1', ++res)
+  return res
+}).then(res => {
+  console.log('promise1', ++res)
+  return MyPromise.resolve(res) // 注意这里不一样
+}).then(res => {
+  console.log('promise1', ++res)
+  return res
+}).then(res => {
+  console.log('promise1', ++res)
+  return res
+}).then(res => {
+  console.log('promise1', ++res)
+  return res
+})
+
+console.log('normal')
+
+new MyPromise(resolve => {
+  console.log('promise2')
+  resolve(1)
+}).then(res => {
+  console.log('promise2', ++res)
+  return res
+}).then(res => {
+  console.log('promise2', ++res)
+  return res
+}).then(res => {
+  console.log('promise2', ++res)
+  return res
+}).then(res => {
+  console.log('promise2', ++res)
+  return res
+}).then(res => {
+  console.log('promise2', ++res)
+  return res
+})
