@@ -14,7 +14,7 @@ function handlerFile (filePath, shouldupdate = false) {
 			if (err) reject(err)
 			let str = fd.toString()
 			// match title type time keyword
-			let title = (str.match(/##\s*?.+?\n/) || [''])[0].replace(/(##\s*?)([^\s]+?)(\n)/, '$2')
+			let title = (str.match(/##\s*?[^\n]+\n/) || [''])[0].replace(/(##\s*?)(.+)(\n)/, '$2')
 			let type = getTags(TYPE_CLASS, str)[0]
 			let tips = getTags(KW_CLASS, str)
 			let time = getTags(TIME_CLASS, str)[0].replace(/({{\s*)(\d+)?(.+)?/, '$2')
@@ -151,6 +151,7 @@ module.exports = function (env) {
 			list = list.filter(item => item)
 			nameSet = new Set(list.map(item => getFile(item.file)))
 			// set config
+			console.log(list)
 			return genConfig(list)
 		})
 }

@@ -11,6 +11,7 @@ function getTags (className, str) {
 function handler (changeFile, callback) {
 	if ((changeFile && /.\md$/.test(changeFile)) || changeFile === void 0) {
 		fs.readdir(path.join(__dirname, '../src/pages'), (err, files) => {
+			err && console.log(err)
 			Promise.all(files.filter(file => /.\md$/.test(file))
 				.map(file => new Promise((resolve, reject) => {
 					let p = path.join(__dirname, `../src/pages/${file}`)
@@ -53,7 +54,7 @@ function handler (changeFile, callback) {
 				resList.sort((pre, next) => pre.time - next.time)
 				let str = `export default ${JSON.stringify(resList)}`
 				// 生成标题及关键字及路由名称文件
-				fs.writeFile(path.join(__dirname, '../src/router/config.js'), str, err => {
+				fs.writeFile(path.join(__dirname, '../src/router/config.js'), str, () => {
 					callback && callback('success')
 				})
 			}).catch(err => {

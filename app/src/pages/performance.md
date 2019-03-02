@@ -1,6 +1,6 @@
-# 吹毛求疵的 js 性能
+## 吹毛求疵的 js 性能
 
-<b class='type'>js</b>
+<b class="update-time">{{1551503599649 | formatTime}}</b><b class='type'>js</b>
 <b class='kw'>js 性能</b> <b class='kw'>数组、Set、对象、Map</b>
 
 > 测试环境 MBP 17款 16G； Chrome 71
