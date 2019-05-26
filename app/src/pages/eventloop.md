@@ -19,7 +19,6 @@
     resolve(1)
   }).then(res => {
     console.log('promise1', ++res)
-    performance.now()
     return res
   }).then(res => {
     console.log('promise1', ++res)
