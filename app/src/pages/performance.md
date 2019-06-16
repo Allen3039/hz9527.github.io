@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ## 吹毛求疵的 js 性能
 
 <b class="update-time">{{1551503599649 | formatTime}}</b><b class='type'>js</b>
@@ -53,18 +54,44 @@ const arr = [];
 const target = `item_${Ind}`
 for (let i = 0; i < Len; i++) {
   arr.push(`item_${i}`)
+=======
+# js 底层性能小探
+
+> js 作为一门动态类型语言，在内存分配管理有着特殊的机制。包括其模拟类的实现依赖原型，在一些细节上处理不同，性能也是完全不同的
+
+## 数组遍历
+
+### 查找数组某个成员
+
+> for find findIndex indexOf
+
+```js
+const CASE = 1;
+const ind = 10010;
+const Len = 1000000;
+const Arr = [];
+const findValue = `value_${ind}`;
+for (let i = 0; i < Len; i++) {
+  Arr.push(`value_${i}`);
+>>>>>>> fix: 404
 }
 
 function case1() {
   console.time('for');
+<<<<<<< HEAD
   for (let i = 0, l = arr.length; i < l; i++) {
     if (arr[i] === target) break;
+=======
+  for (let i = 0, l = Arr.length; i < l; i++) {
+    if (Arr[i] === findValue) break;
+>>>>>>> fix: 404
   }
   console.timeEnd('for');
 }
 
 function case2() {
   console.time('find');
+<<<<<<< HEAD
   arr.find(item => item === target);
   console.timeEnd('find');
 }
@@ -158,10 +185,51 @@ executors[CASE - 1]();
 
 使用对象、没有原型的对象、map
 ```js
+=======
+  Arr.find(i => i === findValue)
+  console.timeEnd('find');
+}
+function case3() {
+  console.time('findIndex');
+  Arr.findIndex(i => i === findValue)
+  console.timeEnd('findIndex');
+}
+
+function case4() {
+  console.time('indexOf');
+  Arr.indexOf(findValue);
+  console.timeEnd('indexOf');
+}
+
+switch (CASE) {
+  case 1:
+    case1();
+    break;
+  case 2:
+    case2();
+    break;
+  case 3:
+    case3();
+    break;
+  case 4:
+    case4();
+    break;
+}
+```
+
+## 对象遍历
+
+## 频繁新增、循环、访问、删除成员
+
+```js
+const CASE = 2;
+const Len = 1000000;
+>>>>>>> fix: 404
 const keys = [];
 const values = [];
 const gets = [];
 const dels = [];
+<<<<<<< HEAD
 for (let i = 0; i < 1000000; i++) {
   keys.push(`key_${i}`);
   values.push(`value_${i}`);
@@ -226,3 +294,109 @@ for (let i = 0, l = dels.length; i < l; i++) {
 }
 console.timeEnd('delMap');
 ```
+=======
+
+for (let i = 0; i < Len; i++) {
+  keys.push(`key_${i}`);
+  values.push(`value_${i}`);
+  i % 3 === 0 && gets.push(i);
+  i % 5 === 0 && dels.push(i);
+}
+const obj = {};
+const map = new Map();
+const nullObj = Object.create(null);
+function case1() {
+  console.time('addToObj');
+  for (let i = 0, l = keys.length; i < l; i++) {
+    obj[keys[i]] = values[i];
+  }
+  console.timeEnd('addToObj');
+
+  console.time('forObj');
+  const members = Object.keys(obj);
+  for (let i = 0, l = members.length; i < l; i++) {
+    if (obj[members[i]]) {}
+  }
+  console.timeEnd('forObj');
+
+  // Promise.resolve().then(() => {
+  //   console.time('getObj');
+  //   for (let i = 0, l = gets.length; i < l; i++) {
+  //     if (obj[keys[gets[i]]]) {}
+  //   }
+  //   console.timeEnd('getObj');
+  // }).then(() => {
+  //   console.time('delObj');
+  //   for (let i = 0, l = dels.length; i < l; i++) {
+  //     delete obj[keys[dels[i]]]
+  //   }
+  //   console.timeEnd('delObj');
+  // })
+}
+
+function case2() {
+  console.time('addToMap');
+  for (let i = 0, l = keys.length; i < l; i++) {
+    map.set(keys[i], values[i]);
+  }
+  console.timeEnd('addToMap');
+
+  console.time('forMap');
+  const members = map.keys();
+  for (let key of members) {
+    if (map.get(key)) {}
+  }
+  console.timeEnd('forMap');
+
+  // Promise.resolve().then(() => {
+  //   console.time('getMap');
+  //   for (let i = 0, l = gets.length; i < l; i++) {
+  //     if (map.get(keys[gets[i]])) {}
+  //   }
+  //   console.timeEnd('getMap');
+  // }).then(() => {
+  //   console.time('delMap');
+  //   for (let i = 0, l = dels.length; i < l; i++) {
+  //     map.delete(keys[dels[i]]);
+  //   }
+  //   console.timeEnd('delMap');
+  // })
+}
+
+function case3() {
+  console.time('addToNullObj');
+  for (let i = 0, l = keys.length; i < l; i++) {
+    nullObj[keys[i]] = values[i];
+  }
+  console.timeEnd('addToNullObj');
+
+  Promise.resolve().then(() => {
+    console.time('getNullObj');
+    for (let i = 0, l = gets.length; i < l; i++) {
+      if (nullObj[keys[gets[i]]]) {}
+    }
+    console.timeEnd('getNullObj');
+  }).then(() => {
+    console.time('delNullObj');
+    for (let i = 0, l = dels.length; i < l; i++) {
+      delete nullObj[keys[dels[i]]]
+    }
+    console.timeEnd('delNullObj');
+  })
+}
+
+switch (CASE) {
+  case 1:
+    case1();
+    break;
+  case 2:
+    case2();
+    break;
+  case 3:
+    case3();
+    break;
+}
+```
+
+## 是否必要缓存？
+>>>>>>> fix: 404

@@ -8,8 +8,8 @@ export default new Router({
 	routes: config.map(item => ({
 		path: '/' + item.time,
 		component: () => import(`../pages/${item.file}`)
-	})).concat({
+	})).concat([{
 		path: '*',
 		redirect: '/' + config[0].time
-	})
+	}])
 })

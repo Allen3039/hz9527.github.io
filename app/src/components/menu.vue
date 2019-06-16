@@ -23,6 +23,7 @@
 <script>
 import Config from '../router/getConfig.js'
 import Serach from './search.vue'
+import {resolveUrl} from '../utils/search'
 const MenuConf = new Map(['js', 'css', '框架', '工程化', '踩坑', '其他'].map((key, i) => [key, -i - 1]))
 const MenuDefault = '其他'
 export default {
@@ -31,6 +32,15 @@ export default {
 			now: Date.now(),
 			menu: this.initMenu(),
 			curItem: ''
+		}
+	},
+	mounted () {
+		// init route
+		const KEY = 'REDIRECT_PAGE'
+		const page = localStorage.getItem(KEY)
+		if (page) {
+			localStorage.removeItem(KEY)
+			this.$router.replace(resolveUrl(page))
 		}
 	},
 	watch: {

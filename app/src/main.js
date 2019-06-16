@@ -32,6 +32,14 @@ Vue.directive('toggle', {
 	}
 })
 
+router.afterEach((to) => {
+	if (to.hash) {
+		requestAnimationFrame(() => {
+			location.hash = to.hash.replace('$', '')
+		})
+	}
+})
+
 /* eslint-disable no-new */
 new Vue({
 	el: '#app',

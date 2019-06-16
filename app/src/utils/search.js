@@ -54,3 +54,22 @@ export default function search (kw, source) {
 export function padNum (num) {
 	return (num > 9 && num) || `0${num}`
 }
+
+export function resolveUrl (url) {
+	try {
+		const {pathname: path, hash, search} = new URL(url)
+		const result = {path}
+		if (hash) {
+			result.hash = decodeURIComponent(hash).replace('#', '#$')
+		}
+		if (search) {
+			result.query = search.slice(1).split('&').reduce((res, str) => {
+				const [key, value] = str.split('=')
+				res[key] = value
+			}, {})
+		}
+		return result
+	} catch (e) {
+		return {path: '/'}
+	}
+}

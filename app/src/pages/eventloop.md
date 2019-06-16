@@ -1,6 +1,6 @@
 ## 事件循环的一点疑惑
 
-<b class="update-time">{{1542638521139 | formatTime}}</b><b class="type">其他</b>
+<b class="update-time">{{1560665780980 | formatTime}}</b><b class="type">其他</b>
 <b class='kw'>promise</b> <b class='kw'>事件循环</b> <b class='kw'>宏队列与微队列</b>
 
 > 我们知道 js 是单线程执行的，但是借助宿主，可以获得异步的能力，在浏览器中依赖 webAPI，在 node 中依赖 libuv
@@ -202,7 +202,7 @@ setTimeout(() => {
 
 答案是 2 1。或许你这里就算用了 performance 也不能看出端倪，但是我们知道 Promise 是异步就好了
 
-```html
+```xml
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -241,6 +241,5 @@ setTimeout(() => {
 #### 一次事件循环会执行完所有微队列
 
 这一部分感觉没什么好说的，但是可以说的是必须清空微队列才会进入新的事件循环，也就是意味着在一个微队列里执行新的微队列会在一次事件循环里
-
 
 <b class="show-blog">true</b>
