@@ -3,7 +3,7 @@ const path = require('path')
 const utils = require('./utils')
 const config = require('../config')
 const vueLoaderConfig = require('./vue-loader.conf')
-const handlerSource = require('./mdPlugins.js')
+const {formatLinkPlugin, addMenuPlugin} = require('./mdPagePlugin/mdPlugins')
 
 function resolve (dir) {
 	return path.join(__dirname, '..', dir)
@@ -45,20 +45,20 @@ module.exports = {
 			...(config.dev.useEslint ? [createLintingRule()] : []),
 			{
 				test: /\.md$/,
-				loader: 'vue-markdown-loader',
-				options: {
-					preprocess (mdIt, source) {
-						return handlerSource(source)
+				use: [
+					{
+						loader: 'vue-markdown-loader',
+						options: {
+							use: [
+								[formatLinkPlugin],
+								[addMenuPlugin]
+							]
+						}
 					},
-					use: [
-						[
-							require('markdown-it-anchor'),
-							{
-								slugify: string => string
-							}
-						]
-					]
-				}
+					{
+						loader: path.resolve(__dirname, './mdPagePlugin/index.js')
+					}
+				]
 			},
 			{
 				test: /\.vue$/,

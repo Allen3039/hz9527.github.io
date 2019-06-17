@@ -151,7 +151,7 @@ module.exports = function (env) {
 			list = list.filter(item => item)
 			nameSet = new Set(list.map(item => getFile(item.file)))
 			// set config
-			console.log(list)
+			// console.log(list)
 			return genConfig(list)
 		})
 }

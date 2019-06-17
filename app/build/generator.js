@@ -72,7 +72,7 @@ module.exports = function generator (env) { // accept 'dev' 'build'
 			if (state === 0) {
 				state = 1
 				handler(file, msg => {
-					console.log(msg)
+					// console.log(msg)
 					if (state === 2) {
 						handler(file, msg => {
 							console.log(msg)
