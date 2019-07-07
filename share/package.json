@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "setData": "cd setData && nodeppt start -w"
+    "setData": "cd setData && nodeppt start -w",
+    "dev": "nodeppt start -w"
   },
   "keywords": [],
   "author": "",

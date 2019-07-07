@@ -1,0 +1,36 @@
+<html>
+<body>
+  <!-- <link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/4.0.0-alpha.4/css/bootstrap.css"> -->
+    <h2>Hello</h2>
+    <script>
+    // alert(1)
+    function printH2() {
+        var i = 0;
+        while (i++ < 10000000) {}
+        console.log('first script', document.querySelectorAll('link'));
+    }
+    function console2 (v) {
+      var i = 0;
+      while (i++ < 10000000) {}
+      console.log(v)
+    }
+    function runProm() {
+      Promise.resolve()
+        .then(console2)
+    }
+    runProm();
+    // printH2()
+    console2(1)
+    // setTimeout(printH2)
+    </script>
+    <script>
+    console2('second script');
+    </script>
+
+    <link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/4.0.0-alpha.4/css/bootstrap.css">
+    <h2>World</h2>
+    <script>
+    console2('last script');
+    </script>
+</body>
+</html>

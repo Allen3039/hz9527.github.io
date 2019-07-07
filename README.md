@@ -16,8 +16,17 @@
 ### feature规划
 - [x] 自动生成配置文件，用于路由及搜索使用
 - [x] 自动生成更新时间，嵌入markdown文件，根据更新时间在目录栏展示
+  -[ ] 单独文件保持，不再保存到 md 文件
 - [x] 自定义markdown－loader，支持锚点，自动生成文章大纲，自动注入一些class等
-- [ ] 自定义页面是否显示（dev可见，prod不可见）
+- [x] 自定义页面是否显示（dev可见，prod不可见）
+- [x] 支持页面间跳转和 iframe 接入
+- [ ] 演示代码沙盒
+- [ ] gitment 接入 & mta 接入
+  * https://github.com/imsun/gitment
+  https://blog.julysong.com/2018/09/26/gitment/
+  http://www.coldcrack.me/2018/07/18/Next_Gittalk/
+  https://vssue.js.org/zh/demo/
+  * https://mta.qq.com/mta/overview/ctr_all_app_new?tab=2
 - [ ] 开发首页并支持配置
 - [ ] 动画效果
 - [ ] 移动端适配

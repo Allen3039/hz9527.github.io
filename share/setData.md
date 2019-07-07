@@ -1,7 +1,7 @@
 title: 浅尝小程序 setData
 speaker: hz9527
 transition: slide3
-files: /share.js,/share.css,/zoom.js
+files: /base/share.js,/base/share.css,/base/zoom.js
 theme: moon
 usemathjax: yes
 
@@ -35,9 +35,9 @@ while (queue.waitForMessage()) {
 
 [slide]
 
-<img src="/assets/eventLoop.jpg" width="80%">
+<img src="/setData/assets/eventLoop.jpg" width="80%">
 [slide data-transition="vertical3d"]
-<img src="/assets/eventLoop2.png" width="60%">
+<img src="/setData/assets/eventLoop2.png" width="60%">
 
 [slide]
 
@@ -61,14 +61,14 @@ setData (newData, completeCb = noop) {
 
 ## 再看事件循环
 
-<img src="/assets/default.svg" width="70%">
+<img src="/setData/assets/default.svg" width="70%">
 [slide data-transition="vertical3d"]
-<img src="/assets/eventLoop3.png" width="80%">
+<img src="/setData/assets/eventLoop3.png" width="80%">
 
 [slide]
 
 ----
-<iframe data-src="/assets/demo.html" style="height: 600px"></iframe>
+<iframe data-src="/setData/assets/demo.html" style="height: 600px"></iframe>
 
 {:&.fadeIn}
 

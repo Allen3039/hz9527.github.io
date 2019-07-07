@@ -1,6 +1,6 @@
 ## async&await正确的打开方式
 
-<b class="update-time">{{1560771004219 | formatTime}}</b><b class='type'>js</b>
+<b class="update-time">{{1560777844790 | formatTime}}</b><b class='type'>js</b>
 <b class='kw'>async</b> <b class='kw'>await</b> <b class='kw'>async&await使用</b>
 
 > 由于过去一直沉浸在Promise的世界里，对async和await使用较少，在此也谈谈自己的见解吧
@@ -8,6 +8,7 @@
 ### 快速开箱
 
 x[test](./call.md)
+<iframe src="../../static/test.html" width="100%" height="500px" frameborder="0" scrolling="no"></iframe>
 
 ### 注意事项
 
